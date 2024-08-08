@@ -18,8 +18,13 @@ jobs:
     name: Delete Untagged Images
     runs-on: ubuntu-latest
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@5c7944e73c4c2a096b17a9cb74d65b6c2bbafbde # v2.9.1
+        with:
+          egress-policy: audit
+
       - name: Prune Dev
-        uses: vlaurin/action-ghcr-prune@v0.5.0
+        uses: vlaurin/action-ghcr-prune@0a539594d122b915e71c59733a5b115bfaaf5d52 # v0.5.0
         with:
           container: dev
           token: ${{ env.ACCESS_TOKEN }}
@@ -28,7 +33,7 @@ jobs:
           prune-untagged: true
 
       - name: Prune Notebook
-        uses: vlaurin/action-ghcr-prune@v0.5.0
+        uses: vlaurin/action-ghcr-prune@0a539594d122b915e71c59733a5b115bfaaf5d52 # v0.5.0
         with:
           container: notebook
           token: ${{ env.ACCESS_TOKEN }}
@@ -37,7 +42,7 @@ jobs:
           prune-untagged: true
 
       - name: Prune Rust
-        uses: vlaurin/action-ghcr-prune@v0.5.0
+        uses: vlaurin/action-ghcr-prune@0a539594d122b915e71c59733a5b115bfaaf5d52 # v0.5.0
         with:
           container: rust
           token: ${{ env.ACCESS_TOKEN }}
@@ -46,7 +51,7 @@ jobs:
           prune-untagged: true
 
       - name: Prune Web
-        uses: vlaurin/action-ghcr-prune@v0.5.0
+        uses: vlaurin/action-ghcr-prune@0a539594d122b915e71c59733a5b115bfaaf5d52 # v0.5.0
         with:
           container: web
           token: ${{ env.ACCESS_TOKEN }}
@@ -55,7 +60,7 @@ jobs:
           prune-untagged: true
 
       - name: Prune Gold
-        uses: vlaurin/action-ghcr-prune@v0.5.0
+        uses: vlaurin/action-ghcr-prune@0a539594d122b915e71c59733a5b115bfaaf5d52 # v0.5.0
         with:
           container: gold
           token: ${{ env.ACCESS_TOKEN }}
