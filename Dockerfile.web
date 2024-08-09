@@ -53,7 +53,8 @@ RUN nix-env --install --file /tmp/scripts/manifest.nix \
 # %runscript
 #
 WORKDIR /root/dev
+SHELL ["/bin/bash", "-c"]
 HEALTHCHECK --interval=5m --timeout=30s --start-period=10s --retries=3 \
-    CMD curl --fail --insecure "https://localhost:4873" || exit 1
+    CMD ["sh", "-c", "curl --fail --insecure https://localhost:4873 || exit 1"]
 ENTRYPOINT [ "/init" ]
 CMD ["/bin/zsh"]
