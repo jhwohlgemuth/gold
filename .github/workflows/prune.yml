@@ -5,7 +5,7 @@ permissions:
 
 env:
   ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  KEEP_UNTAGGED_COUNT: 0
+  KEEP_LAST: 3
   USER: jhwohlgemuth
 
 on:
@@ -29,7 +29,7 @@ jobs:
           container: dev
           token: ${{ env.ACCESS_TOKEN }}
           user: ${{ env.USER }}
-          keep-last: ${{ env.KEEP_UNTAGGED_COUNT }}
+          keep-last: ${{ env.KEEP_LAST }}
           prune-untagged: true
 
       - name: Prune Notebook
@@ -38,7 +38,7 @@ jobs:
           container: notebook
           token: ${{ env.ACCESS_TOKEN }}
           user: ${{ env.USER }}
-          keep-last: ${{ env.KEEP_UNTAGGED_COUNT }}
+          keep-last: ${{ env.KEEP_LAST }}
           prune-untagged: true
 
       - name: Prune Rust
@@ -47,7 +47,7 @@ jobs:
           container: rust
           token: ${{ env.ACCESS_TOKEN }}
           user: ${{ env.USER }}
-          keep-last: ${{ env.KEEP_UNTAGGED_COUNT }}
+          keep-last: ${{ env.KEEP_LAST }}
           prune-untagged: true
 
       - name: Prune Web
@@ -56,7 +56,7 @@ jobs:
           container: web
           token: ${{ env.ACCESS_TOKEN }}
           user: ${{ env.USER }}
-          keep-last: ${{ env.KEEP_UNTAGGED_COUNT }}
+          keep-last: ${{ env.KEEP_LAST }}
           prune-untagged: true
 
       - name: Prune Gold
@@ -65,5 +65,5 @@ jobs:
           container: gold
           token: ${{ env.ACCESS_TOKEN }}
           user: ${{ env.USER }}
-          keep-last: ${{ env.KEEP_UNTAGGED_COUNT }}
+          keep-last: ${{ env.KEEP_LAST }}
           prune-untagged: true
