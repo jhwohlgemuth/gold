@@ -6,7 +6,6 @@ permissions:
 env:
   ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   KEEP_LAST: 3
-  USER: jhwohlgemuth
 
 on:
   workflow_dispatch:
@@ -28,7 +27,6 @@ jobs:
         with:
           container: dev
           token: ${{ env.ACCESS_TOKEN }}
-          user: ${{ env.USER }}
           keep-last: ${{ env.KEEP_LAST }}
           prune-untagged: true
 
@@ -37,7 +35,6 @@ jobs:
         with:
           container: notebook
           token: ${{ env.ACCESS_TOKEN }}
-          user: ${{ env.USER }}
           keep-last: ${{ env.KEEP_LAST }}
           prune-untagged: true
 
@@ -46,7 +43,6 @@ jobs:
         with:
           container: rust
           token: ${{ env.ACCESS_TOKEN }}
-          user: ${{ env.USER }}
           keep-last: ${{ env.KEEP_LAST }}
           prune-untagged: true
 
@@ -55,7 +51,6 @@ jobs:
         with:
           container: web
           token: ${{ env.ACCESS_TOKEN }}
-          user: ${{ env.USER }}
           keep-last: ${{ env.KEEP_LAST }}
           prune-untagged: true
 
@@ -64,6 +59,5 @@ jobs:
         with:
           container: gold
           token: ${{ env.ACCESS_TOKEN }}
-          user: ${{ env.USER }}
           keep-last: ${{ env.KEEP_LAST }}
           prune-untagged: true
