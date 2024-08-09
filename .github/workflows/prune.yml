@@ -6,8 +6,9 @@ permissions:
 env:
   ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   KEEP_LAST: 2
-  KEEP_REGEX: |
+  PRUNE_REGEX: |
     ^\d+[.]\d+[.]\d+$
+    ^\d+[.]\d+[.]\d+_beta$
   DRYRUN: true
 
 on:
@@ -32,7 +33,7 @@ jobs:
           dry-run: ${{ env.DRYRUN }}
           token: ${{ env.ACCESS_TOKEN }}
           keep-last: ${{ env.KEEP_LAST }}
-          keep-tags-regexes: ${{ env.KEEP_REGEX }}
+          prune-tags-regexes: ${{ env.PRUNE_REGEX }}
           prune-untagged: true
 
       - name: Prune Notebook
@@ -42,7 +43,7 @@ jobs:
           dry-run: ${{ env.DRYRUN }}
           token: ${{ env.ACCESS_TOKEN }}
           keep-last: ${{ env.KEEP_LAST }}
-          keep-tags-regexes: ${{ env.KEEP_REGEX }}
+          prune-tags-regexes: ${{ env.PRUNE_REGEX }}
           prune-untagged: true
 
       - name: Prune Rust
@@ -52,7 +53,7 @@ jobs:
           dry-run: ${{ env.DRYRUN }}
           token: ${{ env.ACCESS_TOKEN }}
           keep-last: ${{ env.KEEP_LAST }}
-          keep-tags-regexes: ${{ env.KEEP_REGEX }}
+          prune-tags-regexes: ${{ env.PRUNE_REGEX }}
           prune-untagged: true
 
       - name: Prune Web
@@ -62,7 +63,7 @@ jobs:
           dry-run: ${{ env.DRYRUN }}
           token: ${{ env.ACCESS_TOKEN }}
           keep-last: ${{ env.KEEP_LAST }}
-          keep-tags-regexes: ${{ env.KEEP_REGEX }}
+          prune-tags-regexes: ${{ env.PRUNE_REGEX }}
           prune-untagged: true
 
       - name: Prune Gold
@@ -72,5 +73,5 @@ jobs:
           dry-run: ${{ env.DRYRUN }}
           token: ${{ env.ACCESS_TOKEN }}
           keep-last: ${{ env.KEEP_LAST }}
-          keep-tags-regexes: ${{ env.KEEP_REGEX }}
+          prune-tags-regexes: ${{ env.PRUNE_REGEX }}
           prune-untagged: true
