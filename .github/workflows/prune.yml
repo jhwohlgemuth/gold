@@ -5,7 +5,7 @@ permissions:
 
 env:
   ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  KEEP_LAST: 0
+  KEEP_LAST: 2
   KEEP_REGEX: ^\d[.]\d[.]\d$
   DRYRUN: true
 
