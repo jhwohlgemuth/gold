@@ -5,11 +5,11 @@ permissions:
 
 env:
   ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  KEEP_LAST: 2
+  KEEP_LAST: 4
   PRUNE_REGEX: |
     ^\d+[.]\d+[.]\d+$
     ^\d+[.]\d+[.]\d+_beta$
-  DRYRUN: true
+  DRYRUN: false
 
 on:
   workflow_dispatch:
