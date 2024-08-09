@@ -3,7 +3,7 @@ FROM ghcr.io/jhwohlgemuth/rust:latest
 # %labels
 #
 LABEL author="Jason Wohlgemuth"
-LABEL org.opencontainers.image.source https://github.com/jhwohlgemuth/gold
+LABEL org.opencontainers.image.source=https://github.com/jhwohlgemuth/gold
 LABEL org.opencontainers.image.description="Environment for working on provably correct software"
 LABEL org.opencontainers.image.licenses=MIT
 #
@@ -48,12 +48,11 @@ RUN chmod +x /tmp/scripts/* \
     && /tmp/scripts/install_dependencies.sh \
     && /tmp/scripts/install_ocaml.sh \
     && /tmp/scripts/install_coq.sh \
-    && /tmp/scripts/install_provers.sh \
-    && elan default leanprover/lean4:stable \
     && mv /tmp/scripts/install_aeneas.sh /usr/local/bin/install_aeneas \
     && mv /tmp/scripts/install_creusot.sh /usr/local/bin/install_creusot \
     && mv /tmp/scripts/install_frama-c.sh /usr/local/bin/install_frama-c \
     && mv /tmp/scripts/install_klee.sh /usr/local/bin/install_klee \
+    && mv /tmp/scripts/install_provers.sh /usr/local/bin/install_provers \
     && mv /tmp/scripts/install_verus.sh /usr/local/bin/install_verus \
     && mv /tmp/logo_coq.png "${JUPYTER_KERNELS}/coq/logo-64x64.png" \
     && mv /tmp/logo_ocaml.png "${JUPYTER_KERNELS}/ocaml/logo-64x64.png" \
