@@ -47,7 +47,6 @@ RUN nix-env --install --file /tmp/scripts/manifest.nix \
         verdaccio@^5.29.2 \
         rescript@^10.1.4 \
         esy@^0.7.2 \
-    && curl -sSL https://get.wasp-lang.dev/installer.sh | sh \
     && chmod +x /etc/services.d/verdaccio/run /etc/services.d/verdaccio/finish
 #
 # %runscript
