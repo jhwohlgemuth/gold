@@ -1,5 +1,5 @@
 .CodeMirror {
-    font-family: 'JetBrainsMono NF', 'Cascadia Code PL', 'Fira Code';
+    font-family: 'JetBrainsMono NF', 'Cascadia Code PL', 'Fira Code', monospace;
     font-variant-ligatures: initial;
 }
 .cm-string {
