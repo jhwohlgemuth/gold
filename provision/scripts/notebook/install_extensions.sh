@@ -16,7 +16,7 @@ main() {
     # Install Code Server extensions
     #
     if [[ -z "$1" ]]; then
-        ARGS=notebook
+        ARGS=development
     else
         ARGS=("$@")
     fi
