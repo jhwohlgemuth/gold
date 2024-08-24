@@ -22,7 +22,7 @@ COPY --chmod=0755 ./provision/scripts/rust/* /tmp/scripts/
 # %post
 #
 SHELL ["/bin/bash", "-c"]
-RUN chmod +x /tmp/scripts/* \
+RUN  /tmp/scripts/install_dependencies.sh \
     && curl https://sh.rustup.rs -sSf | bash -s -- -y \
     && rustup toolchain install nightly \
     && cargo install \
