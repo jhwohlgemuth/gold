@@ -16,6 +16,7 @@ main() {
         -p git \
         -p history-substring-search \
         -p wd \
+        -p zoxide \
         -p https://github.com/zsh-users/zsh-autosuggestions \
         -p https://github.com/zsh-users/zsh-syntax-highlighting \
         -p https://github.com/conda-incubator/conda-zsh-completion \
