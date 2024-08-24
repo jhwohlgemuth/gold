@@ -22,11 +22,11 @@ install_nvidia_container_toolkit() {
     # Install NVIDIA Container Toolkit
     # https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
     #
-    # shellcheck source=/dev/null
-    . /etc/os-release
-    curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | apt-key add -
-    # shellcheck disable=SC2154
-    curl -s -L "https://nvidia.github.io/nvidia-docker/${ID}${VERSION_ID}/nvidia-docker.list" | tee /etc/apt/sources.list.d/nvidia-docker.list
+    local NVIDIA_URL = 'https://nvidia.github.io/libnvidia-container'
+    curl -fsSL "${NVIDIA_URL}/gpgkey" | \gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+    curl -s -L "${NVIDIA_URL}/stable/deb/nvidia-container-toolkit.list" | \
+        sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+        tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
     apt-get update
     apt-get install --yes nvidia-container-toolkit
     service docker restart
