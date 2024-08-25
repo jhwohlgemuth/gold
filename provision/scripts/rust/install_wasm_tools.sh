@@ -177,7 +177,11 @@ main() {
                 #
                 # Experimental, web-native, Unix-like operating and development environment
                 #
-                bash -c "$(curl -sSL https://raw.githubusercontent.com/tractordev/wanix/main/install.sh)"
+                local INSTALL_DIRECTORY=/wanix
+                gum spin --title "Cloning WANIX to ${INSTALL_DIRECTORY}" -- git clone https://github.com/tractordev/wanix.git "${INSTALL_DIRECTORY}"
+                gum spin --title "Installing WANIX" -- bash -c "$(curl -sSL https://raw.githubusercontent.com/tractordev/wanix/main/install.sh)"
+                echo -e '{{ Color "46" "wanix" }} command must be run from within {{ Color "6" "/wanix" }}\n' | gum format -t template
+                cd "${INSTALL_DIRECTORY}" || exit
                 ;;
             WEPL)
                 #
