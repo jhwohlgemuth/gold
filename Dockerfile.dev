@@ -59,7 +59,7 @@ ADD "${S6_OVERLAY_GITHUB}/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-sy
 #
 SHELL ["/bin/bash", "-c"]
 RUN /tmp/scripts/install_dependencies.sh \
-    && stow --dir "${DOTFILES}" --target "${HOME}" --stow neovim ohmyposh powershell powerlevel10k \
+    && stow --dir "${DOTFILES}" --target "${HOME}" --stow git neovim ohmyposh powershell powerlevel10k \
     && /tmp/scripts/configure_locale.sh \
     && /tmp/scripts/install_dotnet.sh \
     && /tmp/scripts/install_ohmyzsh.sh \
