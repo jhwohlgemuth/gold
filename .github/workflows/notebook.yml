@@ -24,6 +24,10 @@ on:
       - config/jupyter/**
       - provision/scripts/notebook/**
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-and-push:
     permissions:

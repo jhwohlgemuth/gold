@@ -5,7 +5,7 @@ permissions:
 
 env:
   ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  KEEP_LAST: 4
+  KEEP_LAST: 6
   PRUNE_REGEX: |
     ^\d+[.]\d+[.]\d+$
     ^\d+[.]\d+[.]\d+_beta$

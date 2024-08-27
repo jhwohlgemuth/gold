@@ -22,6 +22,10 @@ on:
       - Dockerfile.rust
       - provision/scripts/rust/install_wasm_tools.sh
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-and-push:
     permissions:
