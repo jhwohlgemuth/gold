@@ -5,7 +5,8 @@ requires \
     ast-grep \
     direnv \
     fuck \
-    python3
+    python3 \
+    zoxide
 main() {
     local ZSH_SHELL="${1:-/usr/bin/zsh}"
     local ZSHRC="${HOME}/.zshrc"
@@ -23,6 +24,7 @@ main() {
         echo 'bindkey "\$terminfo[kcud1]" history-substring-search-down'
         echo 'eval "$(direnv hook zsh)"'
         echo 'eval "$(thefuck --alias oops)"'
+        echo 'eval "$(zoxide init zsh)"'
         echo "source ${HOME}/.p10k.zsh"
         echo 'alias python=python3'
         echo 'alias pip=pip3'

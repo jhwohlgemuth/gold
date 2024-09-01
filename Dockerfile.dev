@@ -74,11 +74,11 @@ RUN /tmp/scripts/install_dependencies.sh \
     && mv /tmp/scripts/install_xr0.sh /usr/local/bin/install_xr0 \
     && mv /tmp/scripts/start_pinokio.sh /usr/local/bin/start_pinokio \
     && /usr/bin/pwsh -Command /tmp/scripts/Install-Modules.ps1 \
-    && /tmp/scripts/configure_ohmyzsh.sh \
     && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" \
         && brew bundle --file /tmp/scripts/Brewfile \
         && brew cleanup --prune=all \
         && eval "$(pkgx integrate)" \
+    && /tmp/scripts/configure_ohmyzsh.sh \
     && find "${NEOVIM_ROOT}" -name "*.vim" -print0 | xargs -0 dos2unix \
     && tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz \
     && tar -C / -Jxpf /tmp/s6-overlay-x86_64.tar.xz \
