@@ -7,7 +7,7 @@ install_docker() {
     # Install Docker
     #
     ulimit -n 65536
-    apt-get install --yes \
+    apt-get install --no-install-recommends --yes \
         docker-ce \
         docker-ce-cli \
         containerd.io \
@@ -28,7 +28,7 @@ install_nvidia_container_toolkit() {
         | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' \
         | tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
     apt-get update
-    apt-get install --yes nvidia-container-toolkit
+    apt-get install --no-install-recommends --yes nvidia-container-toolkit
     service docker restart
 }
 main() {
@@ -43,7 +43,7 @@ main() {
     local KEY_ROOT="/etc/apt/keyrings"
     local KEY="${KEY_ROOT}/docker.gpg"
     apt-get update
-    apt-get install --yes \
+    apt-get install --no-install-recommends --yes \
         ca-certificates \
         gnupg
     install -m 0755 -d "${KEY_ROOT}"
