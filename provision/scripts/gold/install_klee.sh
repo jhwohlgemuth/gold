@@ -4,7 +4,8 @@ set -e
 requires \
     git \
     cmake \
-    make
+    make \
+    z3
 install_llvm() {
     apt-get update
     apt-get install --no-install-recommends -y \

@@ -3,7 +3,8 @@ set -e
 
 requires \
     git \
-    wget
+    wget \
+    z3
 main() {
     #
     # Install Verus
@@ -13,7 +14,6 @@ main() {
     chmod +x /verus/tools/activate
     /verus/tools/activate
     cd /verus/source
-    ./tools/get-z3.sh
     /verus/tools/vargo/target/release/vargo build --release
     ln -s /verus/source/target-verus/release/verus /usr/local/bin/verus
     #
