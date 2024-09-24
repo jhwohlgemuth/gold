@@ -33,7 +33,6 @@ jobs:
           dry-run: ${{ env.DRYRUN }}
           token: ${{ env.ACCESS_TOKEN }}
           keep-last: ${{ env.KEEP_LAST }}
-          prune-tags-regexes: ${{ env.PRUNE_REGEX }}
           prune-untagged: true
 
       - name: Prune Notebook
@@ -43,7 +42,6 @@ jobs:
           dry-run: ${{ env.DRYRUN }}
           token: ${{ env.ACCESS_TOKEN }}
           keep-last: ${{ env.KEEP_LAST }}
-          prune-tags-regexes: ${{ env.PRUNE_REGEX }}
           prune-untagged: true
 
       - name: Prune Rust
@@ -53,7 +51,6 @@ jobs:
           dry-run: ${{ env.DRYRUN }}
           token: ${{ env.ACCESS_TOKEN }}
           keep-last: ${{ env.KEEP_LAST }}
-          prune-tags-regexes: ${{ env.PRUNE_REGEX }}
           prune-untagged: true
 
       - name: Prune Web
@@ -63,7 +60,6 @@ jobs:
           dry-run: ${{ env.DRYRUN }}
           token: ${{ env.ACCESS_TOKEN }}
           keep-last: ${{ env.KEEP_LAST }}
-          prune-tags-regexes: ${{ env.PRUNE_REGEX }}
           prune-untagged: true
 
       - name: Prune Gold
@@ -73,5 +69,4 @@ jobs:
           dry-run: ${{ env.DRYRUN }}
           token: ${{ env.ACCESS_TOKEN }}
           keep-last: ${{ env.KEEP_LAST }}
-          prune-tags-regexes: ${{ env.PRUNE_REGEX }}
           prune-untagged: true
