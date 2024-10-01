@@ -54,7 +54,7 @@ Container Customization
 
 > [!NOTE]
 > [`install_extensions`](./provision/scripts/notebook/install_extensions.sh) accepts any number of image names (see [Image Design section](#image-design))</br>
-> *Example* `install_extensions notebook dotnet web`
+> *Example* `install_extensions development python rust`
 
 The following environment variables are available to customize containers:
 - `CODE_SERVER_CONFIG`: Location of code-server server configuration file (within container)
