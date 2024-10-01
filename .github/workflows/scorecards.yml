@@ -48,7 +48,6 @@ jobs:
           # (Optional) "write" PAT token. Uncomment the `repo_token` line below if:
           # - you want to enable the Branch-Protection check on a *public* repository, or
           # - you are installing Scorecards on a *private* repository
-          # To create the PAT, follow the steps in https://github.com/ossf/scorecard-action#authentication-with-pat.
           # repo_token: ${{ secrets.SCORECARD_TOKEN }}
 
           # Public repositories:
@@ -60,7 +59,8 @@ jobs:
           #     of the value entered here.
           publish_results: true
 
-      # Upload the results as artifacts (optional). Commenting out will disable uploads of run results in SARIF
+      # Upload the results as artifacts (optional).
+      # Commenting out will disable uploads of run results in SARIF
       # format to the repository Actions tab.
       - name: "Upload artifact"
         uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
