@@ -33,19 +33,14 @@ COPY ./config/.utoprc "${HOME}/"
 COPY ./config/init.ml "${HOME}/.config/utop/"
 COPY ./config/jupyter/logo_coq.png /tmp/
 COPY ./config/jupyter/logo_ocaml.png /tmp/
-COPY ./provision/scripts/gold/* /tmp/scripts/
+COPY --chmod=0755 ./provision/scripts/gold/* /tmp/scripts/
 #
 # %post
 #
 SHELL ["/bin/bash", "-c"]
-RUN mkdir -p \
-    "${HOME}/.config/utop/" \
-    "${JUPYTER_KERNELS}/coq" \
-    "${JUPYTER_KERNELS}/ocaml"
 RUN nix-env --install --file /tmp/scripts/manifest.nix
 SHELL ["/root/miniconda3/bin/conda", "run", "-n", "base", "/bin/bash", "-c"]
-RUN chmod +x /tmp/scripts/* \
-    && /tmp/scripts/install_dependencies.sh \
+RUN /tmp/scripts/install_dependencies.sh \
     && /tmp/scripts/install_ocaml.sh \
     && /tmp/scripts/install_coq.sh \
     && mv /tmp/scripts/install_aeneas.sh /usr/local/bin/install_aeneas \
