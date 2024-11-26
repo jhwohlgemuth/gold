@@ -23,12 +23,8 @@ ENV JUPYTER_PORT=13337
 #
 # %setup
 #
-SHELL ["/bin/bash", "-c"]
-RUN mkdir -p \
-    /tmp/scripts \
-    "${HOME}/.config/utop/" \
-    "${JUPYTER_KERNELS}/coq" \
-    "${JUPYTER_KERNELS}/ocaml"
+# Only supported by Apptainer
+# Run setup commands outside of the container (on the host system) after the base image bootstrap.
 #
 # %files
 #
@@ -42,6 +38,10 @@ COPY ./provision/scripts/gold/* /tmp/scripts/
 # %post
 #
 SHELL ["/bin/bash", "-c"]
+RUN mkdir -p \
+    "${HOME}/.config/utop/" \
+    "${JUPYTER_KERNELS}/coq" \
+    "${JUPYTER_KERNELS}/ocaml"
 RUN nix-env --install --file /tmp/scripts/manifest.nix
 SHELL ["/root/miniconda3/bin/conda", "run", "-n", "base", "/bin/bash", "-c"]
 RUN chmod +x /tmp/scripts/* \
