@@ -29,21 +29,15 @@ ENV PATH="${PATH}:/app/code-server/bin"
 #
 # %setup
 #
-SHELL ["/bin/bash", "-c"]
-RUN mkdir -p \
-    /tmp/scripts \
-    "${HOME}/dev/notebooks" \
-    "${CERTS_DIR}" \
-    "${JUPYTER_ROOT}/custom" \
-    "${JUPYTER_LAB_ROOT}/settings" \
-    /app/code-server/config/data/Machine
+# Only supported by Apptainer
+# Run setup commands outside of the container (on the host system) after the base image bootstrap.
 #
 # %files
 #
-COPY ./config/jupyter/ca.cnf "${CERTS_DIR}"
-COPY ./config/jupyter/custom.css "${JUPYTER_ROOT}/custom"
+COPY ./config/jupyter/ca.cnf "${CERTS_DIR}/"
+COPY ./config/jupyter/custom.css "${JUPYTER_ROOT}/custom/"
 COPY ./config/jupyter/jupyter_notebook_config.py "${JUPYTER_ROOT}"
-COPY ./config/jupyter/overrides.json "${JUPYTER_LAB_ROOT}/settings"
+COPY ./config/jupyter/overrides.json "${JUPYTER_LAB_ROOT}/settings/"
 COPY ./config/jupyter/environment.yml /tmp/
 COPY ./config/code-server/config.yaml /app/code-server/config/
 COPY ./config/code-server/settings.json /app/code-server/config/data/Machine/

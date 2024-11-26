@@ -8,4 +8,4 @@ sed -i "s/password: password/password: ${PASSWORD}/" $CONFIG
 if [ -n "${CODE_SERVER_PASSWORD_HASH}" ]; then
     sed -i "s/password: ${PASSWORD}/hashed-password: ${CODE_SERVER_PASSWORD_HASH}/" $CONFIG
 fi
-exec /app/code-server/bin/code-server --config $CONFIG ~/dev/notebooks >> /etc/services.d/$1/log
+exec /app/code-server/bin/code-server --config $CONFIG ~/dev >> /etc/services.d/$1/log
