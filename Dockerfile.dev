@@ -21,6 +21,8 @@ ARG LANGUAGE=en_US:en
 ARG LC_ALL=en_US.UTF-8
 ARG S6_OVERLAY_VERSION=3.1.5.0
 ARG S6_OVERLAY_GITHUB=https://github.com/just-containers/s6-overlay
+ARG UID=1000
+ARG GID=1000
 #
 # %environment
 #
@@ -38,17 +40,13 @@ ENV GRADIO_SERVER_NAME="0.0.0.0"
 #
 # %setup
 #
-SHELL ["/bin/bash", "-c"]
-RUN ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime \
-    && echo "${TZ}" > /etc/timezone \
-    && mkdir -p \
-        "${HOME}/.ssh" \
-        /tmp/scripts
+# Only supported by Apptainer
+# Run setup commands outside of the container (on the host system) after the base image bootstrap.
 #
 # %files
 #
-COPY --chmod=0755 ./provision/scripts/dev/* /tmp/scripts
-COPY --chmod=0755 ./provision/functions/* /usr/local/bin
+ADD --chmod=0755 ./provision/scripts/dev/* /tmp/scripts/
+ADD --chmod=0755 ./provision/functions/* /usr/local/bin
 ADD https://github.com/jhwohlgemuth/my-shell-setup.git "${DOTFILES}"
 ADD "${S6_OVERLAY_GITHUB}/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz" /tmp
 ADD "${S6_OVERLAY_GITHUB}/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz" /tmp
@@ -58,7 +56,9 @@ ADD "${S6_OVERLAY_GITHUB}/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-sy
 # %post
 #
 SHELL ["/bin/bash", "-c"]
-RUN /tmp/scripts/install_dependencies.sh \
+WORKDIR "${HOME}"
+RUN ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime && echo "${TZ}" > /etc/timezone \
+    && /tmp/scripts/install_dependencies.sh \
     && stow --dir "${DOTFILES}" --target "${HOME}" --stow git neovim ohmyposh powershell powerlevel10k \
     && /tmp/scripts/configure_locale.sh \
     && /tmp/scripts/install_dotnet.sh \
@@ -85,11 +85,14 @@ RUN /tmp/scripts/install_dependencies.sh \
     && tar -C / -Jxpf /tmp/s6-overlay-x86_64.tar.xz \
     && tar -C / -Jxpf /tmp/s6-overlay-symlinks-noarch.tar.xz \
     && tar -C / -Jxpf /tmp/s6-overlay-symlinks-arch.tar.xz \
+    && addgroup --gid "${GID}" nonroot \
+    && adduser --uid "${UID}" --gid "${GID}" --disabled-password --gecos "" nonroot \
+    && echo 'nonroot ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
     && cleanup
 #
 # %runscript
 #
-WORKDIR /root/dev
+WORKDIR "${HOME}/dev"
 HEALTHCHECK NONE
 ENTRYPOINT [ "/init" ]
 CMD ["/bin/zsh"]

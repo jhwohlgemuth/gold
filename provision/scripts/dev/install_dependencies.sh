@@ -28,6 +28,7 @@ apt-get install --no-install-recommends --yes \
     screen \
     software-properties-common \
     stow \
+    sudo \
     tree \
     tzdata \
     unzip \
