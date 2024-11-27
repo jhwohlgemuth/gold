@@ -82,6 +82,7 @@ SCRIPTS = \
 	./provision/notebook/install_code_server.sh \
 	./provision/notebook/install_conda.sh \
 	./provision/notebook/install_dependencies.sh \
+	./provision/rust/install_dependencies.sh \
 	./provision/scripts/dev/install_apptainer.sh \
 	./provision/scripts/dev/install_cosmopolitan.sh \
 	./provision/scripts/dev/install_cuda.sh \
@@ -111,12 +112,11 @@ SCRIPTS = \
 	./provision/scripts/notebook/install_lpython.sh \
 	./provision/scripts/notebook/install_nim.sh \
 	./provision/scripts/notebook/install_scala_jupyter_kernel.sh \
-	./provision/scripts/rust/install_dependencies.sh \
-	./provision/scripts/rust/install_wasm_tools.sh \
 	./.github/actions/build-and-push-image/entrypoint.sh
 FUNCTIONS = \
 	./provision/functions/cleanup \
 	./provision/functions/download_notebooks \
+	./provision/functions/install_wasm_tools \
 	./provision/functions/is_command \
 	./provision/functions/is_installed \
 	./provision/functions/move_lines \

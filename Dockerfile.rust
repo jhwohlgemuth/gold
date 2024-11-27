@@ -17,7 +17,7 @@ ENV PATH="${PATH}:/root/.cargo/bin"
 #
 # %files
 #
-COPY --chmod=0755 ./provision/scripts/rust/* /tmp/scripts/
+COPY --chmod=0755 ./provision/rust/* /tmp/scripts/
 #
 # %post
 #
@@ -29,7 +29,6 @@ RUN  /tmp/scripts/install_dependencies.sh \
         evcxr_repl \
         evcxr_jupyter \
     && evcxr_jupyter --install \
-    && mv /tmp/scripts/install_wasm_tools.sh /usr/local/bin/install_wasm_tools \
     && cleanup
 #
 # %runscript
