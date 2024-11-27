@@ -79,6 +79,9 @@ SCRIPTS = \
 	./provision/dev/configure_locale.sh \
 	./provision/dev/configure_ohmyzsh.sh \
 	./provision/dev/install_dependencies.sh \
+	./provision/notebook/install_code_server.sh \
+	./provision/notebook/install_conda.sh \
+	./provision/notebook/install_dependencies.sh \
 	./provision/scripts/dev/install_apptainer.sh \
 	./provision/scripts/dev/install_cosmopolitan.sh \
 	./provision/scripts/dev/install_cuda.sh \
@@ -99,10 +102,6 @@ SCRIPTS = \
 	./provision/scripts/gold/install_ocaml.sh \
 	./provision/scripts/gold/install_provers.sh \
 	./provision/scripts/gold/install_verus.sh \
-	./provision/scripts/notebook/download_notebooks.sh \
-	./provision/scripts/notebook/install_code_server.sh \
-	./provision/scripts/notebook/install_conda.sh \
-	./provision/scripts/notebook/install_dependencies.sh \
 	./provision/scripts/notebook/install_dotnet_jupyter_kernel.sh \
 	./provision/scripts/notebook/install_elixir_jupyter_kernel.sh \
 	./provision/scripts/notebook/install_elixir.sh \
@@ -117,13 +116,14 @@ SCRIPTS = \
 	./.github/actions/build-and-push-image/entrypoint.sh
 FUNCTIONS = \
 	./provision/functions/cleanup \
+	./provision/functions/download_notebooks \
 	./provision/functions/is_command \
 	./provision/functions/is_installed \
 	./provision/functions/move_lines \
 	./provision/functions/remove_empty_lines \
 	./provision/functions/requires \
 	./provision/functions/start_docker \
-	./provision/functions/start_pinokio \
+	./provision/functions/start_pinokio
 FILES = \
 	./config/code-server/service/finish \
 	./config/code-server/service/run \

@@ -43,6 +43,7 @@ COPY ./config/code-server/config.yaml /app/code-server/config/
 COPY ./config/code-server/settings.json /app/code-server/config/data/Machine/
 COPY --chmod=0755 ./config/jupyter/service/* /etc/services.d/jupyter/
 COPY --chmod=0755 ./config/code-server/service/* /etc/services.d/code-server/
+COPY --chmod=0755 ./provision/notebook/* /tmp/scripts/
 COPY --chmod=0755 ./provision/scripts/notebook/* /tmp/scripts/
 #
 # %post
@@ -57,7 +58,6 @@ RUN openssl req -new -x509 -days 365 -out "${CERTS_DIR}/my.pem" -config "${CERTS
     && mamba clean -yaf \
     && jupyter contrib nbextension install --user \
     && /tmp/scripts/install_code_server.sh \
-    && mv /tmp/scripts/download_notebooks.sh /usr/local/bin/download_notebooks \
     && mv /tmp/scripts/install_dotnet_jupyter_kernel.sh /usr/local/bin/install_dotnet_jupyter_kernel \
     && mv /tmp/scripts/install_elixir.sh /usr/local/bin/install_elixir \
     && mv /tmp/scripts/install_elixir_jupyter_kernel.sh /usr/local/bin/install_elixir_jupyter_kernel \
