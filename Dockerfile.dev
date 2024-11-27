@@ -45,6 +45,7 @@ ENV GRADIO_SERVER_NAME="0.0.0.0"
 #
 # %files
 #
+ADD --chmod=0755 ./provision/dev/* /tmp/scripts/
 ADD --chmod=0755 ./provision/scripts/dev/* /tmp/scripts/
 ADD --chmod=0755 ./provision/functions/* /usr/local/bin
 ADD https://github.com/jhwohlgemuth/my-shell-setup.git "${DOTFILES}"
@@ -72,8 +73,6 @@ RUN ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime && echo "${TZ}" > /etc/ti
     && mv /tmp/scripts/install_musl.sh /usr/local/bin/install_musl \
     && mv /tmp/scripts/install_pinokio.sh /usr/local/bin/install_pinokio \
     && mv /tmp/scripts/install_xr0.sh /usr/local/bin/install_xr0 \
-    && mv /tmp/scripts/start_docker.sh /usr/local/bin/start_docker \
-    && mv /tmp/scripts/start_pinokio.sh /usr/local/bin/start_pinokio \
     && /usr/bin/pwsh -Command /tmp/scripts/Install-Modules.ps1 \
     && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" \
         && brew bundle --file /tmp/scripts/Brewfile \

@@ -2,6 +2,7 @@
 set -e
 
 requires \
+    curl \
     Xvfb
 main() {
     #

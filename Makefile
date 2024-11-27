@@ -28,7 +28,7 @@ check:
 
 .PHONY: build-image
 build-image: format
-	@docker build --no-cache -t ${REGISTRY}/${GITHUB_ACTOR}/${TASK}:$(VERSION) -f ./Dockerfile.${TASK} .
+	# @docker build --no-cache -t ${REGISTRY}/${GITHUB_ACTOR}/${TASK}:$(VERSION) -f ./Dockerfile.${TASK} .
 	@docker build --no-cache -t ${REGISTRY}/${GITHUB_ACTOR}/${TASK} -f ./Dockerfile.${TASK} .
 
 .PHONY: gold gold-push
@@ -76,12 +76,12 @@ IMAGES = \
 	rust \
 	web
 SCRIPTS = \
-	./provision/scripts/dev/configure_locale.sh \
-	./provision/scripts/dev/configure_ohmyzsh.sh \
+	./provision/dev/configure_locale.sh \
+	./provision/dev/configure_ohmyzsh.sh \
+	./provision/dev/install_dependencies.sh \
 	./provision/scripts/dev/install_apptainer.sh \
 	./provision/scripts/dev/install_cosmopolitan.sh \
 	./provision/scripts/dev/install_cuda.sh \
-	./provision/scripts/dev/install_dependencies.sh \
 	./provision/scripts/dev/install_docker.sh \
 	./provision/scripts/dev/install_dotnet.sh \
 	./provision/scripts/dev/install_homebrew.sh \
@@ -90,8 +90,6 @@ SCRIPTS = \
 	./provision/scripts/dev/install_ohmyzsh.sh \
 	./provision/scripts/dev/install_pinokio.sh \
 	./provision/scripts/dev/install_xr0.sh \
-	./provision/scripts/dev/start_docker.sh \
-	./provision/scripts/dev/start_pinokio.sh \
 	./provision/scripts/gold/install_aeneas.sh \
 	./provision/scripts/gold/install_coq.sh \
 	./provision/scripts/gold/install_creusot.sh \
@@ -123,7 +121,9 @@ FUNCTIONS = \
 	./provision/functions/is_installed \
 	./provision/functions/move_lines \
 	./provision/functions/remove_empty_lines \
-	./provision/functions/requires
+	./provision/functions/requires \
+	./provision/functions/start_docker \
+	./provision/functions/start_pinokio \
 FILES = \
 	./config/code-server/service/finish \
 	./config/code-server/service/run \
