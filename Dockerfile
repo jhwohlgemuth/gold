@@ -29,10 +29,6 @@ ENV JUPYTER_PORT=13337
 # %files
 #
 COPY --chmod=0755 ./provision/gold/* /tmp/scripts/
-COPY --chmod=0755 ./provision/scripts/gold/* /tmp/scripts/
-COPY ./config/.iex.exs "${HOME}/"
-COPY ./config/.utoprc "${HOME}/"
-COPY ./config/init.ml "${HOME}/.config/utop/"
 COPY ./config/jupyter/logo_coq.png /tmp/
 COPY ./config/jupyter/logo_ocaml.png /tmp/
 #
@@ -42,14 +38,8 @@ SHELL ["/bin/bash", "-c"]
 RUN nix-env --install --file /tmp/scripts/manifest.nix
 SHELL ["/root/miniconda3/bin/conda", "run", "-n", "base", "/bin/bash", "-c"]
 RUN /tmp/scripts/install_dependencies.sh \
-    && /tmp/scripts/install_ocaml.sh \
-    && /tmp/scripts/install_coq.sh \
-    && mv /tmp/scripts/install_aeneas.sh /usr/local/bin/install_aeneas \
-    && mv /tmp/scripts/install_creusot.sh /usr/local/bin/install_creusot \
-    && mv /tmp/scripts/install_frama-c.sh /usr/local/bin/install_frama-c \
-    && mv /tmp/scripts/install_klee.sh /usr/local/bin/install_klee \
-    && mv /tmp/scripts/install_provers.sh /usr/local/bin/install_provers \
-    && mv /tmp/scripts/install_verus.sh /usr/local/bin/install_verus \
+    && install_ocaml \
+    && install_coq \
     && mv /tmp/logo_coq.png "${JUPYTER_KERNELS}/coq/logo-64x64.png" \
     && mv /tmp/logo_ocaml.png "${JUPYTER_KERNELS}/ocaml/logo-64x64.png" \
     && cleanup

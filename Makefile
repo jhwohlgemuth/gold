@@ -6,9 +6,6 @@ format:
 	@for file in $(FILES) ; do \
         dos2unix $$file; \
     done
-	@for fn in $(FUNCTIONS) ; do \
-        dos2unix $$fn; \
-    done
 lint:
 	@for image in $(IMAGES) ; do \
         hadolint ./Dockerfile.$$image ; \
@@ -20,10 +17,6 @@ check:
 	@for script in $(SCRIPTS) ; do \
 		shfmt --write --list $$script; \
         shellcheck $$script --enable all; \
-    done
-	@for fn in $(FUNCTIONS) ; do \
-		shfmt --write --list --indent 4 --case-indent --space-redirects $$fn; \
-        shellcheck $$fn --enable all; \
     done
 
 .PHONY: build-image
@@ -81,52 +74,12 @@ SCRIPTS = \
 	./provision/dev/configure_ohmyzsh.sh \
 	./provision/dev/install_dependencies.sh \
 	./provision/dev/manifest.nix \
-	./provision/notebook/install_code_server.sh \
-	./provision/notebook/install_conda.sh \
+	./provision/gold/install_dependencies.sh \
+	./provision/gold/manifest.nix \
 	./provision/notebook/install_dependencies.sh \
 	./provision/rust/install_dependencies.sh \
 	./provision/web/manifest.nix \
-	./provision/scripts/dev/install_apptainer.sh \
-	./provision/scripts/dev/install_cosmopolitan.sh \
-	./provision/scripts/dev/install_cuda.sh \
-	./provision/scripts/dev/install_docker.sh \
-	./provision/scripts/dev/install_dotnet.sh \
-	./provision/scripts/dev/install_homebrew.sh \
-	./provision/scripts/dev/install_musl.sh \
-	./provision/scripts/dev/install_nix.sh \
-	./provision/scripts/dev/install_ohmyzsh.sh \
-	./provision/scripts/dev/install_pinokio.sh \
-	./provision/scripts/dev/install_xr0.sh \
-	./provision/scripts/gold/install_aeneas.sh \
-	./provision/scripts/gold/install_coq.sh \
-	./provision/scripts/gold/install_creusot.sh \
-	./provision/scripts/gold/install_dependencies.sh \
-	./provision/scripts/gold/install_frama-c.sh \
-	./provision/scripts/gold/install_klee.sh \
-	./provision/scripts/gold/install_ocaml.sh \
-	./provision/scripts/gold/install_provers.sh \
-	./provision/scripts/gold/install_verus.sh \
-	./provision/scripts/notebook/install_dotnet_jupyter_kernel.sh \
-	./provision/scripts/notebook/install_elixir_jupyter_kernel.sh \
-	./provision/scripts/notebook/install_elixir.sh \
-	./provision/scripts/notebook/install_extensions.sh \
-	./provision/scripts/notebook/install_go_jupyter_kernel.sh \
-	./provision/scripts/notebook/install_latex.sh \
-	./provision/scripts/notebook/install_lpython.sh \
-	./provision/scripts/notebook/install_nim.sh \
-	./provision/scripts/notebook/install_scala_jupyter_kernel.sh \
 	./.github/actions/build-and-push-image/entrypoint.sh
-FUNCTIONS = \
-	./provision/functions/cleanup \
-	./provision/functions/download_notebooks \
-	./provision/functions/install_wasm_tools \
-	./provision/functions/is_command \
-	./provision/functions/is_installed \
-	./provision/functions/move_lines \
-	./provision/functions/remove_empty_lines \
-	./provision/functions/requires \
-	./provision/functions/start_docker \
-	./provision/functions/start_pinokio
 FILES = \
 	./config/code-server/service/finish \
 	./config/code-server/service/run \
@@ -134,6 +87,4 @@ FILES = \
 	./config/jupyter/service/run \
 	./config/verdaccio/service/finish \
 	./config/verdaccio/service/log \
-	./config/verdaccio/service/run \
-	./config/.utoprc \
-	./config/init.ml
+	./config/verdaccio/service/run
