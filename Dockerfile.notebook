@@ -34,6 +34,10 @@ ENV PATH="${PATH}:/app/code-server/bin"
 #
 # %files
 #
+COPY --chmod=0755 ./provision/notebook/* /tmp/scripts/
+COPY --chmod=0755 ./provision/scripts/notebook/* /tmp/scripts/
+COPY --chmod=0755 ./config/jupyter/service/* /etc/services.d/jupyter/
+COPY --chmod=0755 ./config/code-server/service/* /etc/services.d/code-server/
 COPY ./config/jupyter/ca.cnf "${CERTS_DIR}/"
 COPY ./config/jupyter/custom.css "${JUPYTER_ROOT}/custom/"
 COPY ./config/jupyter/jupyter_notebook_config.py "${JUPYTER_ROOT}"
@@ -41,10 +45,6 @@ COPY ./config/jupyter/overrides.json "${JUPYTER_LAB_ROOT}/settings/"
 COPY ./config/jupyter/environment.yml /tmp/
 COPY ./config/code-server/config.yaml /app/code-server/config/
 COPY ./config/code-server/settings.json /app/code-server/config/data/Machine/
-COPY --chmod=0755 ./provision/notebook/* /tmp/scripts/
-COPY --chmod=0755 ./provision/scripts/notebook/* /tmp/scripts/
-COPY --chmod=0755 ./config/jupyter/service/* /etc/services.d/jupyter/
-COPY --chmod=0755 ./config/code-server/service/* /etc/services.d/code-server/
 #
 # %post
 #

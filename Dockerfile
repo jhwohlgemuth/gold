@@ -28,12 +28,13 @@ ENV JUPYTER_PORT=13337
 #
 # %files
 #
+COPY --chmod=0755 ./provision/gold/* /tmp/scripts/
+COPY --chmod=0755 ./provision/scripts/gold/* /tmp/scripts/
 COPY ./config/.iex.exs "${HOME}/"
 COPY ./config/.utoprc "${HOME}/"
 COPY ./config/init.ml "${HOME}/.config/utop/"
 COPY ./config/jupyter/logo_coq.png /tmp/
 COPY ./config/jupyter/logo_ocaml.png /tmp/
-COPY --chmod=0755 ./provision/scripts/gold/* /tmp/scripts/
 #
 # %post
 #
