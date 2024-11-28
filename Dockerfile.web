@@ -23,21 +23,15 @@ ENV PATH="${PATH}:${HOME}/.npm-packages/bin"
 #
 # %setup
 #
-RUN mkdir -p \
-    /tmp/scripts/ \
-    /etc/nixos/ \
-    /verdaccio/conf/ \
-    /etc/services.d/verdaccio/ \
-    /verdaccio/conf \
-    /verdaccio/plugins \
-    /verdaccio/storage
+# Only supported by Apptainer
+# Run setup commands outside of the container (on the host system) after the base image bootstrap.
 #
 # %files
 #
+COPY ./provision/web/* /tmp/scripts/
 COPY ./config/verdaccio/.npmrc "${HOME}/.npmrc"
 COPY ./config/verdaccio/config.yml /verdaccio/conf/
 COPY ./config/verdaccio/service/* /etc/services.d/verdaccio/
-COPY ./provision/scripts/web/manifest.nix /tmp/scripts/
 #
 # %post
 #

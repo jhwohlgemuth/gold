@@ -76,13 +76,16 @@ IMAGES = \
 	rust \
 	web
 SCRIPTS = \
+	./provision/dev/Brewfile \
 	./provision/dev/configure_locale.sh \
 	./provision/dev/configure_ohmyzsh.sh \
 	./provision/dev/install_dependencies.sh \
+	./provision/dev/manifest.nix \
 	./provision/notebook/install_code_server.sh \
 	./provision/notebook/install_conda.sh \
 	./provision/notebook/install_dependencies.sh \
 	./provision/rust/install_dependencies.sh \
+	./provision/web/manifest.nix \
 	./provision/scripts/dev/install_apptainer.sh \
 	./provision/scripts/dev/install_cosmopolitan.sh \
 	./provision/scripts/dev/install_cuda.sh \

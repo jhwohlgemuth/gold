@@ -41,10 +41,10 @@ COPY ./config/jupyter/overrides.json "${JUPYTER_LAB_ROOT}/settings/"
 COPY ./config/jupyter/environment.yml /tmp/
 COPY ./config/code-server/config.yaml /app/code-server/config/
 COPY ./config/code-server/settings.json /app/code-server/config/data/Machine/
-COPY --chmod=0755 ./config/jupyter/service/* /etc/services.d/jupyter/
-COPY --chmod=0755 ./config/code-server/service/* /etc/services.d/code-server/
 COPY --chmod=0755 ./provision/notebook/* /tmp/scripts/
 COPY --chmod=0755 ./provision/scripts/notebook/* /tmp/scripts/
+COPY --chmod=0755 ./config/jupyter/service/* /etc/services.d/jupyter/
+COPY --chmod=0755 ./config/code-server/service/* /etc/services.d/code-server/
 #
 # %post
 #
@@ -71,6 +71,7 @@ RUN openssl req -new -x509 -days 365 -out "${CERTS_DIR}/my.pem" -config "${CERTS
 #
 # %runscript
 #
+USER nonroot
 WORKDIR /root/dev
 SHELL ["/bin/bash", "-c"]
 HEALTHCHECK --interval=5m --timeout=30s --start-period=10s --retries=3 \
