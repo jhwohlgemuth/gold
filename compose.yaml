@@ -2,7 +2,7 @@ name: "gold"
 services:
   proxy:
     container_name: "proxy"
-    image: "ghcr.io/jhwohlgemuth/web:${VERSION}"
+    image: "${REGISTRY}/${GITHUB_ACTOR}/web:${VERSION}"
     ports:
       - "4873:4873"
     restart: unless-stopped
@@ -19,7 +19,7 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
-    image: ghcr.io/jhwohlgemuth/gold:latest
+    image: "${REGISTRY}/${GITHUB_ACTOR}/gold:latest"
     ports:
       - "1337:1337"
       - "13337:13337"
