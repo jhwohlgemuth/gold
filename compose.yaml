@@ -23,6 +23,8 @@ services:
     ports:
       - "1337:1337"
       - "13337:13337"
+    post_start:
+      - command: install_extensions development python rust
     privileged: true
     restart: unless-stopped
     tty: true

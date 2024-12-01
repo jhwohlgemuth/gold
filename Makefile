@@ -1,6 +1,12 @@
-.PHONY: check lint format
+.PHONY: check lint format up down
 
 include .env
+
+up:
+	@docker-compose up --detach
+
+down:
+	@docker-compose down
 
 format:
 	@for script in $(SCRIPTS) ; do \
