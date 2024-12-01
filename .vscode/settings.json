@@ -18,5 +18,18 @@
         "titleBar.inactiveBackground": "#0db7ed99",
         "titleBar.inactiveForeground": "#15202b99"
     },
-    "peacock.color": "#0db7ed"
+    "peacock.color": "#0db7ed",
+    "files.exclude": {
+        "**/*.vo": true,
+        "**/*.vok": true,
+        "**/*.vos": true,
+        "**/*.aux": true,
+        "**/*.glob": true,
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true
+    }
 }

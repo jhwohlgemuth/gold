@@ -1,4 +1,7 @@
 .PHONY: check lint format
+
+include .env
+
 format:
 	@for script in $(SCRIPTS) ; do \
         dos2unix $$script; \
@@ -60,9 +63,6 @@ web-push:
 #
 # Build variables
 #
-VERSION = `cat VERSION`
-REGISTRY = ghcr.io
-GITHUB_ACTOR = jhwohlgemuth
 IMAGES = \
 	dev \
 	notebook \

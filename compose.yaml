@@ -1,0 +1,34 @@
+name: "gold"
+services:
+  proxy:
+    container_name: "proxy"
+    image: "ghcr.io/jhwohlgemuth/web:${VERSION}"
+    ports:
+      - "4873:4873"
+    restart: unless-stopped
+    tty: true
+  dev:
+    container_name: "env"
+    environment:
+      - CODE_SERVER_PORT=1337
+      - CODE_SERVER_PASSWORD=password
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    image: ghcr.io/jhwohlgemuth/gold:latest
+    ports:
+      - "1337:1337"
+      - "13337:13337"
+    privileged: true
+    restart: unless-stopped
+    tty: true
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    ulimits:
+      nofile:
+        soft: "65536"
+        hard: "65536"

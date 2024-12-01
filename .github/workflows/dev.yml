@@ -14,7 +14,7 @@ on:
     branches:
       - main
     paths:
-      - VERSION
+      - .env
       - Dockerfile.dev
       - provision/functions/**
       - provision/scripts/dev/**
