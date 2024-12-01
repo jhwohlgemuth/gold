@@ -2,6 +2,9 @@
 
 include .env
 
+repl: up
+	@docker exec -it env /bin/zsh
+
 up:
 	@docker-compose up --detach
 

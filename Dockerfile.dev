@@ -45,7 +45,7 @@ ENV GRADIO_SERVER_NAME="0.0.0.0"
 # %files
 #
 ADD --chmod=0755 ./provision/dev/* /tmp/scripts/
-ADD https://github.com/jhwohlgemuth/my-shell-setup.git "${DOTFILES}"
+ADD --keep-git-dir=true https://github.com/jhwohlgemuth/my-shell-setup.git "${DOTFILES}"
 ADD "${S6_OVERLAY_GITHUB}/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz" /tmp
 ADD "${S6_OVERLAY_GITHUB}/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz" /tmp
 ADD "${S6_OVERLAY_GITHUB}/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-noarch.tar.xz" /tmp
