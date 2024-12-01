@@ -6,10 +6,10 @@ repl: up
 	@docker exec -it env /bin/zsh
 
 up:
-	@docker-compose up --detach
+	@docker compose up --detach
 
 down:
-	@docker-compose down
+	@docker compose down --volumes
 
 format:
 	@for script in $(SCRIPTS) ; do \
