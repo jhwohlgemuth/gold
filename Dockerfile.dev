@@ -30,7 +30,6 @@ ENV VERSION="${VERSION}"
 ENV TZ=America/New_York
 ENV SHELL=/usr/bin/zsh
 ENV TERM=xterm-256color
-ENV DOTFILES="${HOME}/.dotfiles"
 ENV PATH="${PATH}:${HOME}/.nix-profile/bin"
 ENV PATH="${PATH}:/root/.pixi/bin"
 # Used for Pinokio
@@ -45,7 +44,6 @@ ENV GRADIO_SERVER_NAME="0.0.0.0"
 # %files
 #
 ADD --chmod=0755 ./provision/dev/* /tmp/scripts/
-ADD --keep-git-dir=true https://github.com/jhwohlgemuth/my-shell-setup.git "${DOTFILES}"
 ADD "${S6_OVERLAY_GITHUB}/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz" /tmp
 ADD "${S6_OVERLAY_GITHUB}/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz" /tmp
 ADD "${S6_OVERLAY_GITHUB}/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-noarch.tar.xz" /tmp
@@ -57,13 +55,7 @@ SHELL ["/bin/bash", "-c"]
 WORKDIR "${HOME}"
 RUN ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime && echo "${TZ}" > /etc/timezone \
     && /tmp/scripts/install_dependencies.sh \
-    && stow --dir "${DOTFILES}" --target /usr/local/bin --stow gold \
-    && stow --dir "${DOTFILES}" --target "${HOME}" --stow \
-        git \
-        neovim \
-        ohmyposh \
-        powershell \
-        powerlevel10k \
+    && curl -fsSL https://shell.jasonwohlgemuth.com/install.sh | bash \
     && install_dotnet \
     && install_ohmyzsh \
     && install_homebrew \
