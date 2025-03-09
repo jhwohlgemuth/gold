@@ -78,18 +78,18 @@ IMAGES = \
 	rust \
 	web
 SCRIPTS = \
-	./provision/dev/Brewfile \
 	./provision/dev/configure_locale.sh \
 	./provision/dev/configure_ohmyzsh.sh \
 	./provision/dev/install_dependencies.sh \
-	./provision/dev/manifest.nix \
 	./provision/gold/install_dependencies.sh \
-	./provision/gold/manifest.nix \
 	./provision/notebook/install_dependencies.sh \
 	./provision/rust/install_dependencies.sh \
-	./provision/web/manifest.nix \
 	./.github/actions/build-and-push-image/entrypoint.sh
 FILES = \
+	./provision/dev/Brewfile \
+	./provision/dev/manifest.nix \
+	./provision/gold/manifest.nix \
+	./provision/web/manifest.nix \
 	./config/code-server/service/finish \
 	./config/code-server/service/run \
 	./config/jupyter/service/finish \
