@@ -22,6 +22,8 @@ services:
     image: "${REGISTRY}/${GITHUB_ACTOR}/gold:latest"
     ports:
       - "1337:1337"
+      - "4321:4321"
+      - "8080:8080"
       - "13337:13337"
     post_start:
       - command: install_extensions development python rust
