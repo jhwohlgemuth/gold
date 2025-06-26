@@ -20,7 +20,7 @@ on:
       - main
     paths:
       - Dockerfile.rust
-      - provision/scripts/rust/install_wasm_tools.sh
+      - provision/rust/**
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

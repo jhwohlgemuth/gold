@@ -20,7 +20,7 @@ on:
       - main
     paths:
       - Dockerfile.web
-      - provision/scripts/web/**
+      - provision/web/**
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

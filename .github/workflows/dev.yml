@@ -16,8 +16,7 @@ on:
     paths:
       - .env
       - Dockerfile.dev
-      - provision/functions/**
-      - provision/scripts/dev/**
+      - provision/dev/**
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

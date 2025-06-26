@@ -22,7 +22,7 @@ on:
       - Dockerfile.notebook
       - config/code-server/**
       - config/jupyter/**
-      - provision/scripts/notebook/**
+      - provision/notebook/**
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

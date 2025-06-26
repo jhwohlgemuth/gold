@@ -21,7 +21,7 @@ on:
     paths:
       - Dockerfile
       - config/.iex.exs
-      - provision/scripts/gold/**
+      - provision/gold/**
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
