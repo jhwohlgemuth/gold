@@ -1,4 +1,5 @@
 brew "jandedobbeleer/oh-my-posh/oh-my-posh"
+brew "neovim"
 brew "pixi"
 brew "pkgxdev/made/pkgx"
 brew "uv"

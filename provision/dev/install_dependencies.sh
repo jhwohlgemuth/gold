@@ -18,7 +18,6 @@ apt-get install --no-install-recommends --yes \
     jq \
     less \
     locales \
-    neovim \
     openssh-server \
     python3-dev \
     python3-venv \
