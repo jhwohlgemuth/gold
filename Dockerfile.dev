@@ -62,6 +62,7 @@ RUN ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime && echo "${TZ}" > /etc/ti
     && install_nix && nix-env --install --file /tmp/scripts/manifest.nix \
     && /usr/bin/pwsh -Command /tmp/scripts/Install-Modules.ps1 \
     && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" \
+        && brew tap jandedobbeleer/oh-my-posh \
         && brew bundle --file /tmp/scripts/Brewfile \
         && brew cleanup --prune=all \
         && eval "$(pkgx integrate)" \
