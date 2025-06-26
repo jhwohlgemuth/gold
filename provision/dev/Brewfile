@@ -1,7 +1,7 @@
 brew "jandedobbeleer/oh-my-posh/oh-my-posh"
 brew "neovim"
 brew "pixi"
-brew "pkgxdev/made/pkgx"
+brew "pkgx"
 brew "uv"
 brew "watchman"
 brew "zoxide"
