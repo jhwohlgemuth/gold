@@ -10,7 +10,6 @@ with pkgs; [
     gum
     just
     ripgrep
-    thefuck
     up
     yq
 ]
