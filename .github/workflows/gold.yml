@@ -20,7 +20,6 @@ on:
       - main
     paths:
       - Dockerfile
-      - config/.iex.exs
       - provision/gold/**
 
 concurrency:
