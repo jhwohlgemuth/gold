@@ -1,12 +1,10 @@
-🪙 Gold &nbsp;
-====
+# 🏅 Gold &nbsp;
 [![CodeFactor](https://www.codefactor.io/repository/github/jhwohlgemuth/gold/badge?style=for-the-badge)](https://www.codefactor.io/repository/github/jhwohlgemuth/gold)
 [![Code Size](https://img.shields.io/github/languages/code-size/jhwohlgemuth/gold.svg?style=for-the-badge)](#quick-start)
 
 > Gold is a containerized environment for working on provably correct software [and more](#things-you-can-do-with-gold)
 
-Quick Start
------------
+## Quick Start
 
 Use VS Code in the browser in **Three Easy Steps™**
 
@@ -25,35 +23,31 @@ Use VS Code in the browser in **Three Easy Steps™**
 > [!TIP]
 > See [Container Customization section](#container-customization) for more details on how to customize the container.
 
-What is Gold?
--------------
+## What is Gold?
 > 🚧 UNDER CONSTRUCTION
 
-So what, big deal, who cares?
------------------------------
+## So what, big deal, who cares?
 > 🚧 UNDER CONSTRUCTION
 
 
-Things you can do with Gold
----------------------------
+## Things you can do with Gold
 > [!TIP]
 > See the [examples directory](./examples/) for details on all the things you can do with Gold.
 
-- Write, run, and debug [Coq]() code from within a browser-based instance of VSCode <sup>[3](#3)</sup>
-- Work with modern [Rust]()-based projects to write provably correct software
+- Write, run, and debug [Rocq](https://rocq-prover.org/) code from within a browser-based instance of VSCode <sup>[3](#3)</sup>
+- Work with modern [Rust](https://www.rust-lang.org/)-based projects to write provably correct software
 - Spin up feature-rich development environments for use from a terminal or browser-based IDE <sup>[3](#3)</sup>
-- Work with [WebAssembly]()
+- Work with [WebAssembly](https://webassembly.org/)
 - Quickly and easily compare multiple languages using interative notebooks
 - 🚧 UNDER CONSTRUCTION
 
 
-Container Customization
------------------------
+## Container Customization
 > [!NOTE]
-> Use [`install_extensions`](./provision/scripts/notebook/install_extensions.sh) to install VS Code extensions.
+> Use [`install_extensions`](https://github.com/jhwohlgemuth/my-shell-setup/blob/main/gold/install_extensions) to install VS Code extensions.
 
 > [!NOTE]
-> [`install_extensions`](./provision/scripts/notebook/install_extensions.sh) accepts any number of image names (see [Image Design section](#image-design))</br>
+> [`install_extensions`](https://github.com/jhwohlgemuth/my-shell-setup/blob/main/gold/install_extensions) accepts any number of image names (see [Image Design section](./ARCHITECTURE.md#image-design))</br>
 > *Example* `install_extensions development python rust`
 
 The following environment variables are available to customize containers:
@@ -73,8 +67,11 @@ The following environment variables are available to customize containers:
 > [!TIP]
 > Change environment variables with the `--env` parameter <sup>[4](#4)</sup> (ex. `docker run -it --env CODE_SERVER_PORT=8080 <image>`)
 
-Contributing
-------------
+## Architecture
+> [!TIP]
+> See [ARCHITECTURE.md](./ARCHITECTURE.md)
+
+## Contributing
 > [!TIP]
 > See [CONTRIBUTING.md](./.github/CONTRIBUTING.md)
 
@@ -82,21 +79,16 @@ Contributing
 
 -------------
 
-**Footnotes**
--------------
+## Footnotes
 
-[1]
----
+### [1]
 > `--privileged` is required to use [Apptainer](https://github.com/apptainer/apptainer) within the container
 
-[2]
----
+### [2]
 > The default code-server port can be changed with the `CODE_SERVER_PORT` environment variable. See the [Container Customization section](#container-customization) for more details.
 
-[3]
----
+### [3]
+> See [code-server](https://github.com/coder/code-server) project
 
-
-[4]
----
+### [4]
 > See [docker run documentation](https://docs.docker.com/engine/reference/commandline/container_run/)

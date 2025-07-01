@@ -69,6 +69,9 @@ web:
 web-push:
 	@docker push "${REGISTRY}/${GITHUB_ACTOR}/web:${VERSION}"
 	@docker push "${REGISTRY}/${GITHUB_ACTOR}/web"
+.PHONY: changelog
+changelog:
+	@git-cliff --output CHANGELOG.md --github-token ${GITHUB_TOKEN}
 #
 # Build variables
 #
