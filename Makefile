@@ -1,5 +1,5 @@
-.PHONY: check lint format up down
-
+#!make
+.PHONY: check lint format up down changelog
 include .env
 
 repl: up
@@ -18,6 +18,7 @@ format:
 	@for file in $(FILES) ; do \
         dos2unix $$file; \
     done
+
 lint:
 	@for image in $(IMAGES) ; do \
         hadolint ./Dockerfile.$$image ; \
@@ -25,11 +26,15 @@ lint:
 	@hadolint ./Dockerfile
 	@yamllint .
 	@checkov
+
 check:
 	@for script in $(SCRIPTS) ; do \
 		shfmt --write --list $$script; \
         shellcheck $$script --enable all; \
     done
+
+changelog:
+	@git-cliff --output CHANGELOG.md --github-token ${GITHUB_TOKEN}
 
 .PHONY: build-image
 build-image: format
@@ -69,9 +74,6 @@ web:
 web-push:
 	@docker push "${REGISTRY}/${GITHUB_ACTOR}/web:${VERSION}"
 	@docker push "${REGISTRY}/${GITHUB_ACTOR}/web"
-.PHONY: changelog
-changelog:
-	@git-cliff --output CHANGELOG.md --github-token ${GITHUB_TOKEN}
 #
 # Build variables
 #
