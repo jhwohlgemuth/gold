@@ -26,7 +26,6 @@ apt-get install --no-install-recommends --yes \
     rlwrap \
     screen \
     software-properties-common \
-    stow \
     sudo \
     tree \
     tzdata \
