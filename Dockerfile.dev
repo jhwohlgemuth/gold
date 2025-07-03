@@ -13,7 +13,7 @@ LABEL org.opencontainers.image.licenses=MIT
 #
 # %arguments
 #
-ARG VERSION=0.0.1
+ARG VERSION=0.0.18
 ARG HOME=/root
 ARG DEBIAN_FRONTEND=noninteractive
 ARG LANG=en_US.UTF-8
@@ -55,6 +55,12 @@ SHELL ["/bin/bash", "-c"]
 WORKDIR "${HOME}"
 RUN ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime && echo "${TZ}" > /etc/timezone \
     && /tmp/scripts/install_dependencies.sh \
+    && git clone https://github.com/aspiers/stow.git /tmp/stow \
+        && cd /tmp/stow \
+        && autoreconf --install --force \
+        && ./configure \
+        && make install clean \
+        && cd "${HOME}" \
     && curl -fsSL https://shell.jasonwohlgemuth.com/install.sh | bash \
     && install_dotnet \
     && install_ohmyzsh \

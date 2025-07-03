@@ -33,3 +33,11 @@ apt-get install --no-install-recommends --yes \
     xvfb \
     zip \
     zsh
+#
+# Install stow build dependencies
+#
+apt-get install --no-install-recommends --yes \
+    autoconf \
+    automake \
+    libtool \
+    texinfo
