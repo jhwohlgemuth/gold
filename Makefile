@@ -1,15 +1,6 @@
 #!make
-.PHONY: check lint format up down changelog
+.PHONY: check lint format changelog
 include .env
-
-repl: up
-	@docker exec -it env /bin/zsh
-
-up:
-	@docker compose up --detach
-
-down:
-	@docker compose down --volumes
 
 format:
 	@for script in $(SCRIPTS) ; do \
