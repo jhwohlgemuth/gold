@@ -1,6 +1,6 @@
 # Security <sup>[1](#1)</sup>
 
-If you believe you have found a security [vulnerability](https://www.cve.org/ResourcesSupport/Glossary#glossaryVulnerability) in [Gold](https://github.com/jhwohlgemuth/gold), please report it to us as described below. Althought Gold is primarily intended for research and development, we take all security vulnerabilities seriously.
+If you believe you have found a security [vulnerability](https://www.cve.org/ResourcesSupport/Glossary#glossaryVulnerability) in [Gold](https://github.com/jhwohlgemuth/gold), please report it to us as described below. Although Gold is primarily intended for research and development, we take all security vulnerabilities seriously.
 
 To report a security issue, please use the GitHub Security Advisory ["Report a Vulnerability"](https://github.com/jhwohlgemuth/gold/security/advisories/new) tab.
 
