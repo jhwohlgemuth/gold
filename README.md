@@ -13,7 +13,7 @@ Use VS Code in the browser in **Three Easy Steps™**
     ```shell
     docker run -it \
         --privileged \
-        --name notebook \
+        --name gold \
         --hostname $(hostname) \
         -p 1337:1337 \
         ghcr.io/jhwohlgemuth/gold

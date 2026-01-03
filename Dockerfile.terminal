@@ -1,0 +1,91 @@
+# syntax=docker/dockerfile:1
+ARG BASE=bitnami/minideb
+ARG TAG=bookworm
+ARG IMAGE=$BASE:$TAG
+FROM $IMAGE
+#
+# %labels
+#
+LABEL author="Jason Wohlgemuth"
+LABEL org.opencontainers.image.source=https://github.com/jhwohlgemuth/gold
+LABEL org.opencontainers.image.description="Development environment to build on"
+LABEL org.opencontainers.image.licenses=MIT
+#
+# %arguments
+#
+ARG USER_NAME=nonroot
+ARG HOME="/home/${USER_NAME}"
+ARG UID=1000
+ARG GID=1000
+ARG VERSION=0.0.19
+ARG DEBIAN_FRONTEND=noninteractive
+# Used for Homebrew installation
+ARG NONINTERACTIVE=1
+ARG LANG=en_US.UTF-8
+ARG LANGUAGE=en_US:en
+ARG LC_ALL=en_US.UTF-8
+ARG S6_OVERLAY_VERSION=3.1.5.0
+ARG S6_OVERLAY_GITHUB=https://github.com/just-containers/s6-overlay
+#
+# %environment
+#
+ENV VERSION="${VERSION}"
+ENV TZ=America/New_York
+ENV SHELL=/usr/bin/zsh
+ENV TERM=xterm-256color
+ENV PATH="${PATH}:${HOME}/.nix-profile/bin"
+ENV PATH="${PATH}:${HOME}/.pixi/bin"
+# Used for Pinokio
+ENV DISPLAY=:100
+ENV GRADIO_SERVER_NAME="0.0.0.0"
+ENV GOLD_DOTFILES="${HOME}/.dotfiles"
+#
+# %setup
+#
+# Only supported by Apptainer
+# Run setup commands outside of the container (on the host system) after the base image bootstrap.
+#
+# %files
+#
+COPY --chmod=0755 ./provision/terminal/* /tmp/scripts/
+#
+# %post
+#
+SHELL ["/bin/bash", "-c"]
+USER root
+RUN /tmp/scripts/install_dependencies.sh \
+    && /tmp/scripts/install_dotnet.sh \
+    && /tmp/scripts/create_nonroot_user.sh "${UID}" "${GID}" "${USER_NAME}" "${HOME}" \
+    && chsh -s "${SHELL}" "${USER_NAME}" \
+    && mkdir /nix && mkdir -p /etc/nix && chown -R "${USER_NAME}":"${USER_NAME}" /nix /etc/nix \
+    && touch /.dockerenv
+USER "${USER_NAME}"
+RUN curl -fsSL https://shell.jasonwohlgemuth.com/install.sh | bash \
+    && /usr/bin/pwsh -Command /tmp/scripts/Install-Modules.ps1 \
+    && /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
+        && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" \
+        && brew bundle --file /tmp/scripts/Brewfile \
+        && brew cleanup --prune=all \
+        && eval "$(pkgx integrate)" \
+    && install_nix \
+    && install_ohmyzsh && /tmp/scripts/configure_ohmyzsh.sh
+USER root
+RUN /tmp/scripts/configure_locale.sh \
+    && ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime && echo "${TZ}" > /etc/timezone \
+    && curl -fsSL "${S6_OVERLAY_GITHUB}/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz" -o /tmp/s6-overlay-noarch.tar.xz \
+    && curl -fsSL "${S6_OVERLAY_GITHUB}/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz" -o /tmp/s6-overlay-x86_64.tar.xz \
+    && curl -fsSL "${S6_OVERLAY_GITHUB}/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-noarch.tar.xz" -o /tmp/s6-overlay-symlinks-noarch.tar.xz \
+    && curl -fsSL "${S6_OVERLAY_GITHUB}/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-arch.tar.xz" -o /tmp/s6-overlay-symlinks-arch.tar.xz \
+    && tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz \
+    && tar -C / -Jxpf /tmp/s6-overlay-x86_64.tar.xz \
+    && tar -C / -Jxpf /tmp/s6-overlay-symlinks-noarch.tar.xz \
+    && tar -C / -Jxpf /tmp/s6-overlay-symlinks-arch.tar.xz \
+    && cleanup
+#
+# %runscript
+#
+HEALTHCHECK NONE
+USER "${USER_NAME}"
+WORKDIR "${HOME}"
+ENTRYPOINT [ "/init" ]
+CMD ["/bin/zsh"]

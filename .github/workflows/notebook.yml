@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
   workflow_run:
     workflows:
-      - DEV
+      - TERMINAL
     types:
       - completed
   push:

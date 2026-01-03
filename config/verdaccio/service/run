@@ -1,3 +1,4 @@
 #!/usr/bin/with-contenv bash
 
-verdaccio --config /verdaccio/conf/config.yml
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+verdaccio --config "${HOME}/verdaccio/conf/config.yml" >> /etc/services.d/$1/log 2>&1

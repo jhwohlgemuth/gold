@@ -3,14 +3,16 @@ set -e
 
 requires \
     ast-grep \
+    brew \
     direnv \
     fuck \
+    pip3 \
+    pwsh \
     python3 \
-    zoxide
+    zoxide \
+    zsh
 main() {
-    local ZSH_SHELL="${1:-/usr/bin/zsh}"
     local ZSHRC="${HOME}/.zshrc"
-    chsh -s "${ZSH_SHELL}"
     #
     # Customize .zshrc
     #
@@ -18,10 +20,11 @@ main() {
     # shellcheck disable=SC2016
     {
         echo 'ZLE_RPROMPT_INDENT=0'
-        echo "export SHELL=${ZSH_SHELL}"
+        echo "export SHELL=${SHELL}"
         echo 'export LOCALE_ARCHIVE=/usr/lib/locale/locale-archive'
         echo 'bindkey "\$terminfo[kcuu1]" history-substring-search-up'
         echo 'bindkey "\$terminfo[kcud1]" history-substring-search-down'
+        echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'
         echo 'eval "$(direnv hook zsh)"'
         echo 'eval "$(thefuck --alias oops)"'
         echo 'eval "$(zoxide init zsh)"'

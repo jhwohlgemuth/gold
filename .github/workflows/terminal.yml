@@ -1,11 +1,11 @@
-name: DEV
+name: TERMINAL
 
 permissions:
   contents: read
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: dev
+  IMAGE_NAME: terminal
   ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 on:
@@ -15,8 +15,8 @@ on:
       - main
     paths:
       - .env
-      - Dockerfile.dev
-      - provision/dev/**
+      - Dockerfile.terminal
+      - provision/terminal/**
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

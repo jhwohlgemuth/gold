@@ -1,5 +1,7 @@
 #! /bin/sh
+set -e
 
+export DEBIAN_FRONTEND=noninteractive
 apt-get update
 #
 # Install essential dependencies
@@ -26,6 +28,7 @@ apt-get install --no-install-recommends --yes \
     rlwrap \
     screen \
     software-properties-common \
+    stow \
     sudo \
     tree \
     tzdata \
@@ -33,11 +36,3 @@ apt-get install --no-install-recommends --yes \
     xvfb \
     zip \
     zsh
-#
-# Install stow build dependencies
-#
-apt-get install --no-install-recommends --yes \
-    autoconf \
-    automake \
-    libtool \
-    texinfo

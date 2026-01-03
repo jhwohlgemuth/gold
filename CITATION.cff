@@ -29,7 +29,7 @@ keywords:
   - development
   - containers
   - correctness
-  - coq
+  - rocq
   - lean
   - rust
   - webassembly

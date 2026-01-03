@@ -1,0 +1,15 @@
+#!/usr/bin/with-contenv bash
+
+PORT=${MARIMO_PORT:-13338}
+PASSWORD=${CODE_SERVER_PASSWORD:-password}
+#
+# Marimo Notebook
+#
+exec "${HOME}/miniconda3/bin/conda" run -n base marimo edit \
+    --headless \
+    --host "0.0.0.0" \
+    --port "${PORT}" \
+    --watch \
+    --token-password "${PASSWORD}" \
+    --allow-origins "*" \
+    "${HOME}/dev/notebooks/example.py" >> /etc/services.d/$1/log 2>&1

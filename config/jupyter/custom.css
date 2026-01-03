@@ -1,7 +1,17 @@
 .CodeMirror {
-    font-family: 'JetBrainsMono NF', 'Cascadia Code PL', 'Fira Code', monospace;
-    font-variant-ligatures: initial;
+    font-family: 'Victor Mono', 'VictorMono Nerd Font', 'JetBrainsMono NF', 'Cascadia Code PL', 'Fira Code', monospace;
+    font-variant-ligatures: common-ligatures;
 }
+
 .cm-string {
-    font-variant-ligatures: none;
+    font-variant-ligatures: common-ligatures;
+}
+
+.cm-editor .cm-content {
+    font-feature-settings: "liga" 1, "clig" 1;
+    font-variant-ligatures: common-ligatures;
+}
+
+* {
+    font-variant-ligatures: common-ligatures;
 }

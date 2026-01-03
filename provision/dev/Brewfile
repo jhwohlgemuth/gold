@@ -1,8 +1,0 @@
-brew "jandedobbeleer/oh-my-posh/oh-my-posh"
-brew "neovim"
-brew "pixi"
-brew "pkgx"
-brew "thefuck"
-brew "uv"
-brew "watchman"
-brew "zoxide"

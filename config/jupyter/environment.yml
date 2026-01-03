@@ -1,15 +1,16 @@
 name: base
 channels:
   - conda-forge
-  - defaults
+  - nodefaults
 dependencies:
-  - ipykernel=6.26.0
-  - jupyterlab
+  - ipykernel
+  - jupyterlab>=4,<5
+  - mamba_gator
+  - marimo
   - nb_conda_kernels
-  - notebook
+  - notebook>=7,<8
   - pip=23.3
   - pip:
-      - ipyflow~=0.0.190
-      - ipyparallel~=8.6.1
-      - jupyter_contrib_nbextensions~=0.7.0
-      - mitosheet~=0.1.530
+      - ipyflow
+      - ipyparallel
+      - mitosheet

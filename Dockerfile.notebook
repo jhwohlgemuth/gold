@@ -1,31 +1,46 @@
-FROM ghcr.io/jhwohlgemuth/dev:latest
+ARG VERSION=latest
+FROM ghcr.io/jhwohlgemuth/terminal:$VERSION
 #
 # %labels
 #
 LABEL author="Jason Wohlgemuth"
 LABEL org.opencontainers.image.source=https://github.com/jhwohlgemuth/gold
-LABEL org.opencontainers.image.description="Environment that provides code-server (VS Code) and JupyterLab servers"
+LABEL org.opencontainers.image.description="Environment that provides code-server (VS Code) and JupyterLab server"
 LABEL org.opencontainers.image.licenses=MIT
 #
 # %arguments
 #
-ARG HOME=/root
-ARG MAMBA_VERSION=23.3.1-1
+ARG USER_NAME=nonroot
+ARG HOME="/home/${USER_NAME}"
+ARG MAMBA_VERSION=2.4.0
+ARG VERDACCIO_VERSION=6.2.4
 #
 # %environment
 #
+# code-server
 EXPOSE 1337
+# Verdaccio
+EXPOSE 4873
+# Jupyter Lab
 EXPOSE 13337
-ENV CONDA_DIR=/opt/conda
+# Marimo
+EXPOSE 13338
 # ENV LD_LIBRARY_PATH=/opt/conda/lib:$LD_LIBRARY_PATH
 ENV CERTS_DIR="${HOME}/certs"
+ENV CODE_SERVER_CONFIG_DIR=/app/code-server/config
+ENV CODE_SERVER_PORT=1337
+ENV CONDA_PREFIX="${HOME}/.conda"
+ENV CONDA_ENVS_PATH="${CONDA_PREFIX}/envs"
+ENV CONDA_PKGS_DIRS="${CONDA_PREFIX}/pkgs"
+ENV JUPYTER_LAB_ROOT="${HOME}/miniconda3/share/jupyter/lab"
 ENV JUPYTER_PORT=13337
 ENV JUPYTER_ROOT="${HOME}/.jupyter"
-ENV JUPYTER_LAB_ROOT="${CONDA_DIR}/share/jupyter/lab"
-ENV CODE_SERVER_PORT=1337
-ENV CODE_SERVER_CONFIG_DIR=/app/code-server/config
-ENV PATH="${PATH}:${CONDA_DIR}/bin"
+ENV MAMBA_ROOT="/home/linuxbrew/.linuxbrew/Cellar/micromamba/${MAMBA_VERSION}"
+ENV NODE_OPTIONS="--max-old-space-size=8192"
+ENV NPM_PROXY_PORT=4873
 ENV PATH="${PATH}:/app/code-server/bin"
+ENV PATH="${PATH}:${HOME}/bin"
+ENV PATH="${PATH}:${HOME}/.npm-packages/bin"
 #
 # %setup
 #
@@ -34,36 +49,59 @@ ENV PATH="${PATH}:/app/code-server/bin"
 #
 # %files
 #
+COPY --chmod=0755 --chown=${USER_NAME}:${USER_NAME} ./provision/healthcheck.sh /
 COPY --chmod=0755 ./provision/notebook/* /tmp/scripts/
-COPY --chmod=0755 ./config/jupyter/service/* /etc/services.d/jupyter/
 COPY --chmod=0755 ./config/code-server/service/* /etc/services.d/code-server/
+COPY --chmod=0755 ./config/jupyter/service/* /etc/services.d/jupyter/
+COPY --chmod=0755 ./config/marimo/service/* /etc/services.d/marimo/
+COPY --chmod=0755 ./config/verdaccio/service/* /etc/services.d/verdaccio/
+COPY ./config/code-server/config.yaml /app/code-server/config/
+COPY ./config/code-server/settings.json /app/code-server/config/data/Machine/
 COPY ./config/jupyter/ca.cnf "${CERTS_DIR}/"
 COPY ./config/jupyter/custom.css "${JUPYTER_ROOT}/custom/"
 COPY ./config/jupyter/jupyter_notebook_config.py "${JUPYTER_ROOT}"
-COPY ./config/jupyter/overrides.json "${JUPYTER_LAB_ROOT}/settings/"
+COPY ./config/jupyter/overrides.json /tmp/
 COPY ./config/jupyter/environment.yml /tmp/
-COPY ./config/code-server/config.yaml /app/code-server/config/
-COPY ./config/code-server/settings.json /app/code-server/config/data/Machine/
+COPY ./config/verdaccio/.npmrc "${HOME}/.npmrc"
+COPY ./config/verdaccio/config.yml "${HOME}/verdaccio/conf/"
 #
 # %post
 #
 SHELL ["/bin/bash", "-c"]
-RUN install_conda
-SHELL ["/root/miniconda3/bin/conda", "run", "-n", "base", "/bin/bash", "-c"]
-RUN openssl req -new -x509 -days 365 -out "${CERTS_DIR}/my.pem" -config "${CERTS_DIR}/ca.cnf" \
-    && mv "$(pwd)/my.key" "${CERTS_DIR}" \
-    && /tmp/scripts/install_dependencies.sh \
-    && mamba env update --file /tmp/environment.yml \
-    && mamba clean -yaf \
-    && jupyter contrib nbextension install --user \
-    && install_code_server \
+USER root
+RUN /tmp/scripts/install_dependencies.sh \
+    && openssl req -new -x509 -days 365 -out "${CERTS_DIR}/my.pem" -config "${CERTS_DIR}/ca.cnf" \
+    && mv "$(pwd)/my.key" "${CERTS_DIR}"
+USER "${USER_NAME}"
+RUN install_conda "${HOME}" \
+    && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" \
+    && brew install micromamba --force \
+    && "${MAMBA_ROOT}/bin/mamba" shell init --shell powershell \
+    && "${MAMBA_ROOT}/bin/mamba" shell init --shell zsh \
+    && npm install --registry=https://registry.npmjs.org/ --omit=dev --location=global "verdaccio@^${VERDACCIO_VERSION}"
+RUN mkdir -p "${HOME}/dev/notebooks" \
+    && "${HOME}/miniconda3/bin/conda" env update --file /tmp/environment.yml \
+    && "${HOME}/miniconda3/bin/conda" clean -yaf
+USER root
+RUN install_code_server \
+    && mkdir -p "${JUPYTER_LAB_ROOT}/settings/" && mv /tmp/overrides.json "${JUPYTER_LAB_ROOT}/settings/" \
+    && sed -i "s|https://0.0.0.0:4873|https://0.0.0.0:${NPM_PROXY_PORT}|g" "${HOME}/verdaccio/conf/config.yml" \
+    && chown -R "${USER_NAME}":"${USER_NAME}" \
+        /etc/services.d/{code-server,jupyter,marimo,verdaccio} \
+        /app/code-server \
+        "${HOME}/verdaccio" \
+        "${CERTS_DIR}" \
+        "${JUPYTER_ROOT}" \
+        "${JUPYTER_LAB_ROOT}" \
+    && chmod -R 755 "${CERTS_DIR}" "${JUPYTER_ROOT}" \
     && cleanup
 #
 # %runscript
 #
-WORKDIR /root/dev
+USER "${USER_NAME}"
+WORKDIR "${HOME}/dev"
 SHELL ["/bin/bash", "-c"]
 HEALTHCHECK --interval=5m --timeout=30s --start-period=10s --retries=3 \
-    CMD ["sh", "-c", "curl --fail --insecure https://localhost:${CODE_SERVER_PORT} || exit 1"]
+    CMD ["/bin/bash", "-c", "/healthcheck.sh"]
 ENTRYPOINT [ "/init" ]
 CMD ["/bin/zsh"]

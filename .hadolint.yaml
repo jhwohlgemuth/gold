@@ -7,7 +7,6 @@ ignored:
   - DL3009
   - DL3013
   - DL4006
-  - SC1008
   - SC2086
 
 trustedRegistries:

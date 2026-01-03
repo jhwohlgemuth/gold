@@ -7,7 +7,5 @@ framework:
 output: cli
 quiet: true
 skip-check:
-  - CKV_DOCKER_3
-  - CKV_DOCKER_4
   - CKV_DOCKER_7
 soft-fail: true

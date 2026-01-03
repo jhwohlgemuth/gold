@@ -12,14 +12,14 @@ on:
   workflow_dispatch:
   workflow_run:
     workflows:
-      - RUST
+      - NOTEBOOK
     types:
       - completed
   push:
     branches:
       - main
     paths:
-      - Dockerfile
+      - Dockerfile.gold
       - provision/gold/**
 
 concurrency:

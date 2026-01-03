@@ -1,14 +1,14 @@
-storage: /verdaccio/storage
-plugins: /verdaccio/plugins
+storage: /home/nonroot/verdaccio/storage
+plugins: /home/nonroot/verdaccio/plugins
 web:
-  title: Verdaccio
+  title: npm proxy
   gravatar: true
   darkMode: true
   html_cache: true
   showThemeSwitch: true
 auth:
   htpasswd:
-    file: /verdaccio/storage/htpasswd
+    file: /home/nonroot/verdaccio/storage/htpasswd
     max_users: 1000
 uplinks:
   npmjs:
@@ -33,8 +33,8 @@ userRateLimit:
 listen:
   - https://0.0.0.0:4873
 https:
-  key: /root/certs/my.key
-  cert: /root/certs/my.pem
+  key: /home/nonroot/certs/my.key
+  cert: /home/nonroot/certs/my.pem
 middlewares:
   audit:
     enabled: true

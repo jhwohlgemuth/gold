@@ -1,8 +1,10 @@
 #!make
-.PHONY: check lint format changelog
+.PHONY: $(TARGETS)
 include .env
 
-format:
+prepare: convert lint check
+
+convert:
 	@for script in $(SCRIPTS) ; do \
         dos2unix $$script; \
     done
@@ -16,80 +18,92 @@ lint:
     done
 	@hadolint ./Dockerfile
 	@yamllint .
-	@checkov
 
 check:
 	@for script in $(SCRIPTS) ; do \
 		shfmt --write --list $$script; \
-        shellcheck $$script --enable all; \
+		shellcheck $$script; \
     done
+	@checkov
 
 changelog:
 	@git-cliff --output CHANGELOG.md --github-token ${GITHUB_TOKEN}
 
-.PHONY: build-image
-build-image: format
-	@docker build --no-cache -t ${REGISTRY}/${GITHUB_ACTOR}/${TASK}:$(VERSION) -f ./Dockerfile.${TASK} .
-	@docker build --no-cache -t ${REGISTRY}/${GITHUB_ACTOR}/${TASK} -f ./Dockerfile.${TASK} .
+build-image:
+	@docker build \
+		--no-cache \
+		--build-arg VERSION=$(VERSION) \
+		--file ./Dockerfile.${TASK} \
+		--tag ${REGISTRY}/${GITHUB_ACTOR}/${TASK}:$(VERSION) \
+		.
+# 	@docker build --no-cache  -t ${REGISTRY}/${GITHUB_ACTOR}/${TASK} -f ./Dockerfile.${TASK} .
 
-.PHONY: gold gold-push
-gold: format
-	@docker build --no-cache -t ${REGISTRY}/${GITHUB_ACTOR}/gold -f ./Dockerfile .
-gold-push:
-	@docker push "${REGISTRY}/${GITHUB_ACTOR}/gold"
-
-.PHONY: dev dev-push
-dev:
+terminal:
 	@$(MAKE) TASK=$@ --no-print-directory build-image
-dev-push:
-	@docker push "${REGISTRY}/${GITHUB_ACTOR}/dev:${VERSION}"
-	@docker push "${REGISTRY}/${GITHUB_ACTOR}/dev"
+terminal-push:
+	@docker push "${REGISTRY}/${GITHUB_ACTOR}/terminal:${VERSION}"
+	@docker push "${REGISTRY}/${GITHUB_ACTOR}/terminal"
 
-.PHONY: notebook notebook-push
 notebook:
 	@$(MAKE) TASK=$@ --no-print-directory build-image
 notebook-push:
 	@docker push "${REGISTRY}/${GITHUB_ACTOR}/notebook:${VERSION}"
 	@docker push "${REGISTRY}/${GITHUB_ACTOR}/notebook"
 
-.PHONY: rust rust-push
-rust:
-	@$(MAKE) TASK=$@ --no-print-directory build-image
-rust-push:
-	@docker push "${REGISTRY}/${GITHUB_ACTOR}/rust:${VERSION}"
-	@docker push "${REGISTRY}/${GITHUB_ACTOR}/rust"
+gold:
+	@docker build \
+		--no-cache \
+		--build-arg VERSION=$(VERSION) \
+		--file ./Dockerfile \
+		--tag ${REGISTRY}/${GITHUB_ACTOR}/gold:$(VERSION) \
+		.
+# 	@docker build --no-cache -t ${REGISTRY}/${GITHUB_ACTOR}/gold -f ./Dockerfile .
+gold-push:
+	@docker push "${REGISTRY}/${GITHUB_ACTOR}/gold:${VERSION}"
+	@docker push "${REGISTRY}/${GITHUB_ACTOR}/gold"
 
-.PHONY: web web-push
-web:
-	@$(MAKE) TASK=$@ --no-print-directory build-image
-web-push:
-	@docker push "${REGISTRY}/${GITHUB_ACTOR}/web:${VERSION}"
-	@docker push "${REGISTRY}/${GITHUB_ACTOR}/web"
+all: prepare terminal notebook gold
 #
 # Build variables
 #
 IMAGES = \
-	dev \
-	notebook \
-	rust \
-	web
-SCRIPTS = \
-	./provision/dev/configure_locale.sh \
-	./provision/dev/configure_ohmyzsh.sh \
-	./provision/dev/install_dependencies.sh \
-	./provision/gold/install_dependencies.sh \
-	./provision/notebook/install_dependencies.sh \
-	./provision/rust/install_dependencies.sh \
-	./.github/actions/build-and-push-image/entrypoint.sh
+	terminal \
+	notebook
 FILES = \
-	./provision/dev/Brewfile \
-	./provision/dev/manifest.nix \
-	./provision/gold/manifest.nix \
-	./provision/web/manifest.nix \
+	./.shellcheckrc \
+	./provision/terminal/Brewfile \
 	./config/code-server/service/finish \
 	./config/code-server/service/run \
 	./config/jupyter/service/finish \
 	./config/jupyter/service/run \
+	./config/marimo/service/finish \
+	./config/marimo/service/log \
+	./config/marimo/service/run \
 	./config/verdaccio/service/finish \
 	./config/verdaccio/service/log \
 	./config/verdaccio/service/run
+SCRIPTS = \
+	./provision/healthcheck.sh \
+	./provision/terminal/configure_locale.sh \
+	./provision/terminal/configure_ohmyzsh.sh \
+	./provision/terminal/create_nonroot_user.sh \
+	./provision/terminal/install_dependencies.sh \
+	./provision/terminal/install_dotnet.sh \
+	./provision/notebook/install_dependencies.sh \
+	./provision/gold/install_dependencies.sh \
+	./.github/actions/build-and-push-image/entrypoint.sh
+TARGETS = \
+	all \
+	build-image \
+	changelog \
+	check \
+	convert \
+	fmt \
+	format \
+	gold \
+	gold-push \
+	lint \
+	notebook \
+	notebook-push \
+	terminal \
+	terminal-push

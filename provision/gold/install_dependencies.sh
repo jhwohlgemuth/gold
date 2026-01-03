@@ -1,5 +1,7 @@
 #! /bin/bash
+set -e
 
+export DEBIAN_FRONTEND=noninteractive
 apt-get update
 #
 # Install essential dependencies
@@ -7,7 +9,11 @@ apt-get update
 apt-get install --no-install-recommends -y \
     apt-utils \
     autoconf \
+    bubblewrap \
+    libffi-dev \
     libgmp-dev \
+    libssl-dev \
     libzmq5 \
-    libzmq3-dev \
+    libzmq5-dev \
+    musl-tools \
     pkg-config
