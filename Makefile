@@ -36,7 +36,7 @@ build-image:
 		--file ./Dockerfile.${TASK} \
 		--tag ${REGISTRY}/${GITHUB_ACTOR}/${TASK}:$(VERSION) \
 		.
-# 	@docker build --no-cache  -t ${REGISTRY}/${GITHUB_ACTOR}/${TASK} -f ./Dockerfile.${TASK} .
+	@docker build --no-cache  -t ${REGISTRY}/${GITHUB_ACTOR}/${TASK} -f ./Dockerfile.${TASK} .
 
 terminal:
 	@$(MAKE) TASK=$@ --no-print-directory build-image
@@ -57,7 +57,7 @@ gold:
 		--file ./Dockerfile \
 		--tag ${REGISTRY}/${GITHUB_ACTOR}/gold:$(VERSION) \
 		.
-# 	@docker build --no-cache -t ${REGISTRY}/${GITHUB_ACTOR}/gold -f ./Dockerfile .
+	@docker build --no-cache -t ${REGISTRY}/${GITHUB_ACTOR}/gold -f ./Dockerfile .
 gold-push:
 	@docker push "${REGISTRY}/${GITHUB_ACTOR}/gold:${VERSION}"
 	@docker push "${REGISTRY}/${GITHUB_ACTOR}/gold"
