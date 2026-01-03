@@ -3,7 +3,16 @@
 include .env
 
 prepare: convert lint check
-
+images: prepare terminal-image notebook-image gold-image
+push-all: push-terminal push-notebook push-gold
+changelog:
+	@git-cliff --output CHANGELOG.md --github-token ${GITHUB_TOKEN}
+check:
+	@for script in $(SCRIPTS) ; do \
+		shfmt --write --list $$script; \
+		shellcheck $$script; \
+    done
+	@checkov
 convert:
 	@for script in $(SCRIPTS) ; do \
         dos2unix $$script; \
@@ -11,24 +20,39 @@ convert:
 	@for file in $(FILES) ; do \
         dos2unix $$file; \
     done
-
 lint:
 	@for image in $(IMAGES) ; do \
         hadolint ./Dockerfile.$$image ; \
     done
 	@hadolint ./Dockerfile
 	@yamllint .
-
-check:
-	@for script in $(SCRIPTS) ; do \
-		shfmt --write --list $$script; \
-		shellcheck $$script; \
-    done
-	@checkov
-
-changelog:
-	@git-cliff --output CHANGELOG.md --github-token ${GITHUB_TOKEN}
-
+#
+# Build tasks
+#
+gold-image:
+	@docker build \
+		--no-cache \
+		--build-arg VERSION=$(VERSION) \
+		--file ./Dockerfile \
+		--tag ${REGISTRY}/${GITHUB_ACTOR}/gold:$(VERSION) \
+		.
+	@docker build --no-cache -t ${REGISTRY}/${GITHUB_ACTOR}/gold -f ./Dockerfile .
+terminal-image:
+	@$(MAKE) TASK=terminal --no-print-directory build-image
+notebook-image:
+	@$(MAKE) TASK=notebook --no-print-directory build-image
+#
+# Push tasks
+#
+push-gold:
+	@$(MAKE) IMAGE=gold --no-print-directory push-image
+push-terminal:
+	@$(MAKE) IMAGE=terminal --no-print-directory push-image
+push-notebook:
+	@$(MAKE) IMAGE=notebook --no-print-directory push-image
+#
+# Parameterized tasks
+#
 build-image:
 	@docker build \
 		--no-cache \
@@ -37,32 +61,9 @@ build-image:
 		--tag ${REGISTRY}/${GITHUB_ACTOR}/${TASK}:$(VERSION) \
 		.
 	@docker build --no-cache  -t ${REGISTRY}/${GITHUB_ACTOR}/${TASK} -f ./Dockerfile.${TASK} .
-
-terminal:
-	@$(MAKE) TASK=$@ --no-print-directory build-image
-terminal-push:
-	@docker push "${REGISTRY}/${GITHUB_ACTOR}/terminal:${VERSION}"
-	@docker push "${REGISTRY}/${GITHUB_ACTOR}/terminal"
-
-notebook:
-	@$(MAKE) TASK=$@ --no-print-directory build-image
-notebook-push:
-	@docker push "${REGISTRY}/${GITHUB_ACTOR}/notebook:${VERSION}"
-	@docker push "${REGISTRY}/${GITHUB_ACTOR}/notebook"
-
-gold:
-	@docker build \
-		--no-cache \
-		--build-arg VERSION=$(VERSION) \
-		--file ./Dockerfile \
-		--tag ${REGISTRY}/${GITHUB_ACTOR}/gold:$(VERSION) \
-		.
-	@docker build --no-cache -t ${REGISTRY}/${GITHUB_ACTOR}/gold -f ./Dockerfile .
-gold-push:
-	@docker push "${REGISTRY}/${GITHUB_ACTOR}/gold:${VERSION}"
-	@docker push "${REGISTRY}/${GITHUB_ACTOR}/gold"
-
-all: prepare terminal notebook gold
+push-image:
+	@docker push "${REGISTRY}/${GITHUB_ACTOR}/${IMAGE}:${VERSION}"
+	@docker push "${REGISTRY}/${GITHUB_ACTOR}/${IMAGE}"
 #
 # Build variables
 #
@@ -90,20 +91,20 @@ SCRIPTS = \
 	./provision/terminal/install_dependencies.sh \
 	./provision/terminal/install_dotnet.sh \
 	./provision/notebook/install_dependencies.sh \
-	./provision/gold/install_dependencies.sh \
-	./.github/actions/build-and-push-image/entrypoint.sh
+	./provision/gold/install_dependencies.sh
 TARGETS = \
-	all \
-	build-image \
+	prepare \
+	images \
+	push-all \
 	changelog \
 	check \
 	convert \
-	fmt \
-	format \
-	gold \
-	gold-push \
 	lint \
-	notebook \
-	notebook-push \
-	terminal \
-	terminal-push
+	gold-image \
+	terminal-image \
+	notebook-image \
+	push-gold \
+	push-terminal \
+	push-notebook \
+	build-image \
+	push-image
