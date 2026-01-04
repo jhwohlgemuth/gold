@@ -1,0 +1,59 @@
+name: Development Agent
+description: Handles code quality, formatting, and automated development tasks
+enabled: true
+
+triggers:
+  - event: pull_request
+    branches:
+      - main
+      - develop
+  - event: push
+    branches:
+      - develop
+
+rules:
+  - name: Run Code Quality Checks
+    when:
+      - files_modified: "**/*.sh"
+      - files_modified: "**/*.md"
+    then:
+      - action: run_make_target
+        target: check
+      - action: run_make_target
+        target: lint
+
+  - name: Format Code
+    when:
+      - files_modified: "**/*.sh"
+    then:
+      - action: run_make_target
+        target: convert
+
+  - name: Validate Docker Files
+    when:
+      - files_modified: "Dockerfile*"
+    then:
+      - action: run_make_target
+        target: lint
+
+  - name: Check Configuration Files
+    when:
+      - files_modified: "config/**"
+      - files_modified: ".yamllint.yaml"
+      - files_modified: ".editorconfig"
+    then:
+      - action: run_make_target
+        target: lint
+
+  - name: Verify Scripts
+    when:
+      - files_modified: "provision/**"
+    then:
+      - action: run_make_target
+        target: check
+
+actions:
+  run_make_target:
+    description: Execute a make target
+    parameters:
+      target: Name of the make target to run

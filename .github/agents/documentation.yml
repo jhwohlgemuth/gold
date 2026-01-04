@@ -1,0 +1,111 @@
+name: Documentation Agent
+description: Maintains project documentation consistency and validates documentation completeness
+enabled: true
+
+triggers:
+  - event: pull_request
+    files:
+      - "**.md"
+      - "ARCHITECTURE.md"
+      - "README.md"
+      - "AGENTS.md"
+      - "provision/**"
+  - event: push
+    branches:
+      - main
+    files:
+      - "**.md"
+
+rules:
+  - name: Validate Markdown Formatting
+    when:
+      - files_modified: "**.md"
+    then:
+      - action: check_markdown_syntax
+      - action: validate_links
+      - action: check_front_matter
+
+  - name: Verify Architecture Documentation
+    when:
+      - files_modified: "ARCHITECTURE.md"
+      - files_modified: "Dockerfile*"
+      - files_modified: "config/**"
+    then:
+      - action: validate_architecture_consistency
+      - action: check_diagram_references
+
+  - name: Check README Completeness
+    when:
+      - files_modified: "README.md"
+      - files_modified: ".github/CONTRIBUTING.md"
+    then:
+      - action: validate_readme_sections
+      - action: check_quick_start_commands
+
+  - name: Validate Code Examples
+    when:
+      - files_modified: "**.md"
+      - contains: code_blocks
+    then:
+      - action: validate_code_examples
+      - action: check_example_syntax
+
+  - name: Verify Documentation Cross-References
+    when:
+      - files_modified: "**.md"
+    then:
+      - action: validate_cross_references
+      - action: check_broken_links
+
+  - name: Update Table of Contents
+    when:
+      - files_modified: "README.md"
+      - files_modified: "ARCHITECTURE.md"
+    then:
+      - action: generate_toc
+      - action: update_toc_in_files
+
+actions:
+  check_markdown_syntax:
+    description: Validate markdown syntax and formatting
+    tools:
+      - markdownlint
+      - prettier
+
+  validate_links:
+    description: Check all markdown links are valid
+    tools:
+      - markdown-link-check
+
+  check_front_matter:
+    description: Validate markdown front matter (metadata)
+
+  validate_architecture_consistency:
+    description: Ensure ARCHITECTURE.md matches actual project structure
+
+  check_diagram_references:
+    description: Verify all referenced diagrams exist and are current
+
+  validate_readme_sections:
+    description: Check README contains all required sections
+
+  check_quick_start_commands:
+    description: Validate quick start commands are current and functional
+
+  validate_code_examples:
+    description: Verify code examples in documentation are correct
+
+  check_example_syntax:
+    description: Validate syntax of code examples
+
+  validate_cross_references:
+    description: Ensure all internal links and references are valid
+
+  check_broken_links:
+    description: Scan for broken external links
+
+  generate_toc:
+    description: Generate table of contents from markdown headers
+
+  update_toc_in_files:
+    description: Update table of contents in documentation files

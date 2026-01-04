@@ -1,0 +1,90 @@
+name: Release Agent
+description: Manages release workflows including versioning, changelog, and image publishing
+enabled: true
+
+triggers:
+  - event: release
+    action: published
+  - event: push
+    tags:
+      - "v*"
+
+rules:
+  - name: Build and Push Images on Release
+    when:
+      - event_type: release
+      - action: published
+    then:
+      - action: build_images
+      - action: push_images
+      - action: create_release_summary
+
+  - name: Generate Changelog
+    when:
+      - event_type: push
+      - ref: "main"
+    then:
+      - action: run_make_target
+        target: changelog
+      - action: update_release_notes
+
+  - name: Build Terminal Image
+    when:
+      - event_type: workflow_dispatch
+      - input: build_terminal
+    then:
+      - action: run_make_target
+        target: terminal-image
+      - action: push_image
+        image: terminal
+
+  - name: Build Notebook Image
+    when:
+      - event_type: workflow_dispatch
+      - input: build_notebook
+    then:
+      - action: run_make_target
+        target: notebook-image
+      - action: push_image
+        image: notebook
+
+  - name: Build Gold Image
+    when:
+      - event_type: workflow_dispatch
+      - input: build_gold
+    then:
+      - action: run_make_target
+        target: gold-image
+      - action: push_image
+        image: gold
+
+  - name: Push All Images
+    when:
+      - event_type: workflow_dispatch
+      - input: push_all
+    then:
+      - action: run_make_target
+        target: push-all
+
+actions:
+  build_images:
+    description: Build all Docker images
+    environment: production
+
+  push_images:
+    description: Push Docker images to registry
+    requires_auth: true
+    environment: production
+
+  push_image:
+    description: Push specific Docker image to registry
+    parameters:
+      image: Image name (terminal, notebook, or gold)
+    requires_auth: true
+    environment: production
+
+  create_release_summary:
+    description: Generate release summary with image tags and checksums
+
+  update_release_notes:
+    description: Update release notes with changelog and image information

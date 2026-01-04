@@ -1,0 +1,157 @@
+name: Security Agent
+description: Handles security scanning, vulnerability detection, and dependency audits
+enabled: true
+
+triggers:
+  - event: pull_request
+    files:
+      - "Dockerfile*"
+      - "provision/**"
+      - "package.json"
+      - "requirements.txt"
+      - ".github/**"
+  - event: push
+    branches:
+      - main
+  - event: schedule
+    cron: "0 0 * * 0"  # Weekly on Sunday
+
+rules:
+  - name: Scan Docker Images
+    when:
+      - files_modified: "Dockerfile*"
+    then:
+      - action: scan_dockerfile_security
+      - action: check_base_image_vulnerabilities
+      - action: validate_docker_best_practices
+
+  - name: Check for Secrets
+    when:
+      - event_type: pull_request
+    then:
+      - action: detect_secrets
+      - action: scan_credentials
+      - action: check_env_files
+
+  - name: Check for Secrets on Push
+    when:
+      - event_type: push
+      - ref: main
+    then:
+      - action: detect_secrets
+      - action: scan_credentials
+      - action: check_env_files
+
+  - name: Audit Dependencies
+    when:
+      - files_modified: "provision/**"
+      - files_modified: "*.txt"
+      - files_modified: "package.json"
+    then:
+      - action: audit_dependencies
+      - action: check_known_vulnerabilities
+      - action: validate_package_integrity
+
+  - name: Scan with Checkov
+    when:
+      - files_modified: "Dockerfile*"
+      - files_modified: "config/**"
+      - files_modified: "provision/**"
+    then:
+      - action: run_checkov
+      - action: validate_infrastructure_as_code
+
+  - name: Review Scripts for Security Issues
+    when:
+      - files_modified: "provision/**"
+      - files_modified: "config/*/service/*"
+    then:
+      - action: check_script_security
+      - action: validate_permissions
+      - action: check_hardcoded_secrets
+
+  - name: Validate Security Headers
+    when:
+      - files_modified: "config/**"
+      - files_modified: "Dockerfile*"
+    then:
+      - action: check_security_headers
+      - action: validate_ssl_configuration
+
+  - name: Scheduled Security Audit
+    when:
+      - event_type: schedule
+    then:
+      - action: full_security_audit
+      - action: generate_security_report
+      - action: create_security_issues
+
+actions:
+  scan_dockerfile_security:
+    description: Scan Dockerfiles for security issues
+    tools:
+      - hadolint
+      - trivy
+
+  check_base_image_vulnerabilities:
+    description: Check for known vulnerabilities in base images
+
+  validate_docker_best_practices:
+    description: Validate Docker best practices compliance
+
+  detect_secrets:
+    description: Detect potential secrets in code
+    tools:
+      - detect-secrets
+      - gitleaks
+
+  scan_credentials:
+    description: Scan for exposed credentials
+
+  check_env_files:
+    description: Validate environment files don't contain secrets
+
+  audit_dependencies:
+    description: Audit project dependencies for vulnerabilities
+    tools:
+      - npm audit
+      - pip audit
+
+  check_known_vulnerabilities:
+    description: Check dependencies against known vulnerability databases
+
+  validate_package_integrity:
+    description: Verify package checksums and integrity
+
+  run_checkov:
+    description: Run Checkov infrastructure-as-code scanning
+    severity: required
+
+  validate_infrastructure_as_code:
+    description: Validate IaC configurations
+
+  check_script_security:
+    description: Analyze shell scripts for security issues
+
+  validate_permissions:
+    description: Check file permissions and ownership
+
+  check_hardcoded_secrets:
+    description: Scan for hardcoded secrets in scripts
+
+  check_security_headers:
+    description: Validate security headers configuration
+
+  validate_ssl_configuration:
+    description: Check SSL/TLS configuration
+
+  full_security_audit:
+    description: Perform comprehensive security audit
+    requires_auth: true
+
+  generate_security_report:
+    description: Generate security audit report
+
+  create_security_issues:
+    description: Create issues for discovered vulnerabilities
+    assigns_to: security-team
