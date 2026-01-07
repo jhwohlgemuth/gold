@@ -5,6 +5,7 @@ channels:
 dependencies:
   - ipykernel
   - jupyterlab>=4,<5
+  - jupyter-marimo-proxy
   - mamba_gator
   - marimo
   - nb_conda_kernels
