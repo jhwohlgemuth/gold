@@ -33,6 +33,7 @@ ENV VERSION="${VERSION}"
 ENV TZ=America/New_York
 ENV SHELL=/usr/bin/zsh
 ENV TERM=xterm-256color
+ENV PATH="${PATH}:${HOME}/.local/bin"
 ENV PATH="${PATH}:${HOME}/.nix-profile/bin"
 ENV PATH="${PATH}:${HOME}/.pixi/bin"
 # Used for Pinokio
