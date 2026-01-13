@@ -29,6 +29,7 @@ main() {
         echo 'eval "$(thefuck --alias oops)"'
         echo 'eval "$(zoxide init zsh)"'
         echo "source ${HOME}/.p10k.zsh"
+        echo 'alias clang=clang-13'
         echo 'alias python=python3'
         echo 'alias pip=pip3'
         echo 'alias sgrep=ast-grep'

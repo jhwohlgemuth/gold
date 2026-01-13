@@ -36,7 +36,7 @@ gold-image:
 		--file ./Dockerfile \
 		--tag ${REGISTRY}/${GITHUB_ACTOR}/gold:$(VERSION) \
 		.
-	@docker build --no-cache -t ${REGISTRY}/${GITHUB_ACTOR}/gold -f ./Dockerfile .
+	@docker tag ${REGISTRY}/${GITHUB_ACTOR}/gold:$(VERSION) ${REGISTRY}/${GITHUB_ACTOR}/gold:latest
 terminal-image:
 	@$(MAKE) TASK=terminal --no-print-directory build-image
 notebook-image:
@@ -60,7 +60,7 @@ build-image:
 		--file ./Dockerfile.${TASK} \
 		--tag ${REGISTRY}/${GITHUB_ACTOR}/${TASK}:$(VERSION) \
 		.
-	@docker build --no-cache  -t ${REGISTRY}/${GITHUB_ACTOR}/${TASK} -f ./Dockerfile.${TASK} .
+	@docker tag ${REGISTRY}/${GITHUB_ACTOR}/${TASK}:$(VERSION) ${REGISTRY}/${GITHUB_ACTOR}/${TASK}:latest
 push-image:
 	@docker push "${REGISTRY}/${GITHUB_ACTOR}/${IMAGE}:${VERSION}"
 	@docker push "${REGISTRY}/${GITHUB_ACTOR}/${IMAGE}"
@@ -72,6 +72,7 @@ IMAGES = \
 	notebook
 FILES = \
 	./.shellcheckrc \
+	./provision/gold/Brewfile \
 	./provision/terminal/Brewfile \
 	./config/code-server/service/finish \
 	./config/code-server/service/run \

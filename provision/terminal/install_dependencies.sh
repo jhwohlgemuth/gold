@@ -10,7 +10,9 @@ apt-get install --no-install-recommends --yes \
     binfmt-support \
     build-essential \
     busybox-syslogd \
+    clang-13 \
     cmake \
+    cron \
     curl \
     dos2unix \
     figlet \

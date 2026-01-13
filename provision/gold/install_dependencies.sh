@@ -17,3 +17,36 @@ apt-get install --no-install-recommends -y \
     libzmq5-dev \
     musl-tools \
     pkg-config
+#
+# Install Creusot dependencies
+#
+apt-get install --no-install-recommends -y \
+    libcairo2-dev \
+    libglib2.0-dev \
+    libgtk-3-dev \
+    libgtksourceview-3.0-dev \
+    pkg-config
+#
+# Install Frama-C dependencies
+#
+apt-get install --no-install-recommends -y \
+    graphviz \
+    gtksourceview-3.0 \
+    libcairo2-dev \
+    libgtk2.0-dev \
+    libgtk-3-dev \
+    libunwind-dev
+#
+# Install Klee dependencies
+#
+apt-get install --no-install-recommends -y \
+    llvm-13 \
+    llvm-13-dev \
+    llvm-13-tools \
+    g++-multilib \
+    gcc-multilib \
+    libcap-dev \
+    libgoogle-perftools-dev \
+    libncurses5-dev \
+    libsqlite3-dev \
+    libtcmalloc-minimal4

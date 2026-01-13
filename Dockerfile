@@ -41,6 +41,9 @@ SHELL ["/bin/bash", "-c"]
 USER root
 RUN /tmp/scripts/install_dependencies.sh
 USER "${USER_NAME}"
+RUN eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" \
+    && brew bundle --file /tmp/scripts/Brewfile \
+    && brew cleanup --prune=all
 RUN curl -sSf https://sh.rustup.rs | bash -s -- -y \
     && . "${HOME}/.cargo/env" \
     && rustup toolchain install nightly \
