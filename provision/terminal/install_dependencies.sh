@@ -10,7 +10,7 @@ apt-get install --no-install-recommends --yes \
     binfmt-support \
     build-essential \
     busybox-syslogd \
-    clang-13 \
+    clang-16 \
     cmake \
     cron \
     curl \
