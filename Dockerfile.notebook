@@ -87,6 +87,7 @@ RUN install_code_server \
     && mkdir -p "${JUPYTER_LAB_ROOT}/settings/" && mv /tmp/overrides.json "${JUPYTER_LAB_ROOT}/settings/" \
     && sed -i "s|https://0.0.0.0:4873|https://0.0.0.0:${NPM_PROXY_PORT}|g" "${HOME}/verdaccio/conf/config.yml" \
     && chown -R "${USER_NAME}":"${USER_NAME}" \
+        /usr/local \
         /etc/services.d/{code-server,jupyter,marimo,verdaccio} \
         /app/code-server \
         "${HOME}/verdaccio" \
