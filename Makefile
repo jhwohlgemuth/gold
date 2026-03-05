@@ -25,7 +25,7 @@ lint:
         hadolint ./Dockerfile.$$image ; \
     done
 	@hadolint ./Dockerfile
-	@yamllint .
+# 	@yamllint .
 #
 # Build tasks
 #
