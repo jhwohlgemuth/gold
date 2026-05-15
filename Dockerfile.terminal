@@ -69,7 +69,8 @@ RUN curl -fsSL https://shell.jasonwohlgemuth.com/install.sh | bash \
         && brew cleanup --prune=all \
         && eval "$(pkgx integrate)" \
     && install_nix \
-    && install_ohmyzsh && /tmp/scripts/configure_ohmyzsh.sh
+    && install_ohmyzsh && /tmp/scripts/configure_ohmyzsh.sh \
+    && mkdir -p "${HOME}/.ssh" && chmod 700 "${HOME}/.ssh"
 USER root
 RUN /tmp/scripts/configure_locale.sh \
     && ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime && echo "${TZ}" > /etc/timezone \
