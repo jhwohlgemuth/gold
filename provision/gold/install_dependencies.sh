@@ -40,9 +40,9 @@ apt-get install --no-install-recommends -y \
 # Install Klee dependencies
 #
 apt-get install --no-install-recommends -y \
-    llvm-16 \
-    llvm-16-dev \
-    llvm-16-tools \
+    llvm \
+    llvm-dev \
+    llvm-runtime \
     g++-multilib \
     gcc-multilib \
     libcap-dev \

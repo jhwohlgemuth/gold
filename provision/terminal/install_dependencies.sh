@@ -10,7 +10,7 @@ apt-get install --no-install-recommends --yes \
     binfmt-support \
     build-essential \
     busybox-syslogd \
-    clang-16 \
+    clang \
     cmake \
     cron \
     curl \
@@ -29,7 +29,6 @@ apt-get install --no-install-recommends --yes \
     python3-setuptools \
     rlwrap \
     screen \
-    software-properties-common \
     stow \
     sudo \
     tree \
