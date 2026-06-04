@@ -52,7 +52,7 @@ USER "${USER_NAME}"
 #     && curl -LsSf https://hf.co/cli/install.sh | bash \
 #     && /tmp/scripts/build_llama_cpp_from_source.sh \
 #    && hf download "${HF_REPO}" --local-dir "${MODEL_DIRECTORY}" --token "${HF_API_TOKEN}"
-RUN --mount=type=secret,id=HF_API_TOKEN \
+RUN --mount=type=secret,id=HF_API_TOKEN,env=HF_API_TOKEN \
     mkdir -p "${MODEL_DIRECTORY}" && chmod 777 "${MODEL_DIRECTORY}" \
     && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" \
     && brew install --force hf llama.cpp \

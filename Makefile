@@ -40,7 +40,7 @@ terminal-image:
 notebook-image:
 	@$(MAKE) IMAGE=notebook --no-print-directory build-image
 agentic-image:
-	@$(MAKE) IMAGE=agentic --no-print-directory build-image
+	@$(MAKE) IMAGE=agentic DOCKER_BUILD_SECRETS="--secret id=HF_API_TOKEN,env=HF_API_TOKEN" --no-print-directory build-image
 #
 # Push tasks
 #
@@ -56,12 +56,13 @@ push-agentic:
 # Parameterized tasks
 #
 DOCKERFILE ?= ./Dockerfile.${IMAGE}
+DOCKER_BUILD_SECRETS ?=
 build-image:
-	@docker build \
+	@HF_API_TOKEN="$(HF_API_TOKEN)" docker build \
 		--no-cache \
 		--build-arg VERSION=$(VERSION) \
 		--file ${DOCKERFILE} \
-		--secret id=HF_API_TOKEN \
+		${DOCKER_BUILD_SECRETS} \
 		--tag ${REGISTRY}/${GITHUB_ACTOR}/${IMAGE}:$(VERSION) \
 		.
 	@docker tag ${REGISTRY}/${GITHUB_ACTOR}/${IMAGE}:$(VERSION) ${REGISTRY}/${GITHUB_ACTOR}/${IMAGE}:latest
