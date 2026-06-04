@@ -1,10 +1,11 @@
 #!make
 .PHONY: $(TARGETS)
 include .env
+include .env.secret
 
 prepare: convert lint check
-images: prepare terminal-image notebook-image gold-image
-push-all: push-terminal push-notebook push-gold
+images: prepare terminal-image notebook-image agentic-image gold-image
+push-all: push-terminal push-notebook push-agentic push-gold
 changelog:
 	@git-cliff --output CHANGELOG.md --github-token ${GITHUB_TOKEN}
 check:
@@ -22,25 +23,24 @@ convert:
     done
 lint:
 	@for image in $(IMAGES) ; do \
-        hadolint ./Dockerfile.$$image ; \
+		if [ "$$image" = "gold" ]; then \
+			hadolint ./Dockerfile ; \
+		else \
+			hadolint ./Dockerfile.$$image ; \
+		fi; \
     done
-	@hadolint ./Dockerfile
 # 	@yamllint .
 #
 # Build tasks
 #
 gold-image:
-	@docker build \
-		--no-cache \
-		--build-arg VERSION=$(VERSION) \
-		--file ./Dockerfile \
-		--tag ${REGISTRY}/${GITHUB_ACTOR}/gold:$(VERSION) \
-		.
-	@docker tag ${REGISTRY}/${GITHUB_ACTOR}/gold:$(VERSION) ${REGISTRY}/${GITHUB_ACTOR}/gold:latest
+	@$(MAKE) IMAGE=gold DOCKERFILE=./Dockerfile --no-print-directory build-image
 terminal-image:
-	@$(MAKE) TASK=terminal --no-print-directory build-image
+	@$(MAKE) IMAGE=terminal --no-print-directory build-image
 notebook-image:
-	@$(MAKE) TASK=notebook --no-print-directory build-image
+	@$(MAKE) IMAGE=notebook --no-print-directory build-image
+agentic-image:
+	@$(MAKE) IMAGE=agentic --no-print-directory build-image
 #
 # Push tasks
 #
@@ -50,17 +50,21 @@ push-terminal:
 	@$(MAKE) IMAGE=terminal --no-print-directory push-image
 push-notebook:
 	@$(MAKE) IMAGE=notebook --no-print-directory push-image
+push-agentic:
+	@$(MAKE) IMAGE=agentic --no-print-directory push-image
 #
 # Parameterized tasks
 #
+DOCKERFILE ?= ./Dockerfile.${IMAGE}
 build-image:
 	@docker build \
 		--no-cache \
 		--build-arg VERSION=$(VERSION) \
-		--file ./Dockerfile.${TASK} \
-		--tag ${REGISTRY}/${GITHUB_ACTOR}/${TASK}:$(VERSION) \
+		--file ${DOCKERFILE} \
+		--secret id=HF_API_TOKEN \
+		--tag ${REGISTRY}/${GITHUB_ACTOR}/${IMAGE}:$(VERSION) \
 		.
-	@docker tag ${REGISTRY}/${GITHUB_ACTOR}/${TASK}:$(VERSION) ${REGISTRY}/${GITHUB_ACTOR}/${TASK}:latest
+	@docker tag ${REGISTRY}/${GITHUB_ACTOR}/${IMAGE}:$(VERSION) ${REGISTRY}/${GITHUB_ACTOR}/${IMAGE}:latest
 push-image:
 	@docker push "${REGISTRY}/${GITHUB_ACTOR}/${IMAGE}:${VERSION}"
 	@docker push "${REGISTRY}/${GITHUB_ACTOR}/${IMAGE}"
@@ -69,7 +73,9 @@ push-image:
 #
 IMAGES = \
 	terminal \
-	notebook
+	notebook \
+	agentic \
+	gold
 FILES = \
 	./.shellcheckrc \
 	./provision/gold/Brewfile \
@@ -78,6 +84,9 @@ FILES = \
 	./config/code-server/service/run \
 	./config/jupyter/service/finish \
 	./config/jupyter/service/run \
+	./config/llama.cpp/service/finish \
+	./config/llama.cpp/service/log \
+	./config/llama.cpp/service/run \
 	./config/marimo/service/finish \
 	./config/marimo/service/log \
 	./config/marimo/service/run \
@@ -85,7 +94,8 @@ FILES = \
 	./config/verdaccio/service/log \
 	./config/verdaccio/service/run
 SCRIPTS = \
-	./provision/healthcheck.sh \
+	./provision/healthcheck \
+	./provision/agentic/build_llama_cpp_from_source.sh \
 	./provision/terminal/configure_locale.sh \
 	./provision/terminal/configure_ohmyzsh.sh \
 	./provision/terminal/create_nonroot_user.sh \

@@ -1,0 +1,9 @@
+#!/usr/bin/with-contenv bash
+
+PORT=${LLAMA_ARG_PORT:-1720}
+"${HOME}/llamacpp/llama-server" \
+    --jinja \
+    --offline \
+    --port "${PORT}" \
+    --ssl-key-file "${HOME}/certs/my.key" \
+    --ssl-cert-file "${HOME}/certs/my.pem" >> /etc/services.d/$1/log 2>&1

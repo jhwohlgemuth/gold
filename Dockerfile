@@ -10,6 +10,7 @@ LABEL org.opencontainers.image.licenses=MIT
 #
 # %arguments
 #
+ARG IMAGE=gold
 ARG USER_NAME=nonroot
 ARG HOME="/home/${USER_NAME}"
 ARG LEAN_VERSION=stable
@@ -32,7 +33,7 @@ ENV PATH="${PATH}:${HOME}/.cargo/bin"
 #
 # %files
 #
-COPY --chmod=0755 --chown=${USER_NAME}:${USER_NAME} ./provision/healthcheck.sh /
+COPY --chmod=0755 --chown=${USER_NAME}:${USER_NAME} ./provision/healthcheck /healthcheck
 COPY --chmod=0755 ./provision/gold/* /tmp/scripts/
 #
 # %post
@@ -66,6 +67,6 @@ USER "${USER_NAME}"
 WORKDIR "${HOME}/dev"
 SHELL ["/bin/bash", "-c"]
 HEALTHCHECK --interval=5m --timeout=30s --start-period=10s --retries=3 \
-    CMD ["/bin/bash", "-c", "/healthcheck.sh"]
+    CMD ["/bin/bash", "-c", "/healthcheck"]
 ENTRYPOINT [ "/init" ]
 CMD ["/bin/zsh"]

@@ -1,0 +1,11 @@
+.DS_store
+.env.secret
+.vale/
+/bin
+/content
+/docs/book
+/export
+/extract
+target/
+~$reference.pptx
+data.zip
