@@ -39,8 +39,8 @@ ENV LLAMA_ARG_PORT="${PORT}"
 # %files
 #
 COPY --chmod=0755 --chown=${USER_NAME}:${USER_NAME} ./provision/healthcheck /healthcheck
-COPY --chmod=0755 ./provision/agentic/* /tmp/scripts/
-COPY --chmod=0755 ./config/llama.cpp/service/* /etc/services.d/llama.cpp/
+COPY --chmod=0755 --chown=${USER_NAME}:${USER_NAME} ./config/llama.cpp/service/* /etc/services.d/llama.cpp/
+COPY --chmod=0755 --chown=${USER_NAME}:${USER_NAME} ./provision/agentic/* /tmp/scripts/
 #
 # %post
 #
@@ -56,7 +56,7 @@ RUN --mount=type=secret,id=HF_API_TOKEN,env=HF_API_TOKEN \
     mkdir -p "${MODEL_DIRECTORY}" && chmod 777 "${MODEL_DIRECTORY}" \
     && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" \
     && brew install --force hf llama.cpp \
-    && hf download "${HF_REPO}" --local-dir "${MODEL_DIRECTORY}" --token "${HF_API_TOKEN}"
+    && hf download "${HF_REPO}" --token "${HF_API_TOKEN}"
 USER root
 RUN cleanup
 #
@@ -66,6 +66,6 @@ USER "${USER_NAME}"
 WORKDIR "${HOME}/dev"
 SHELL ["/bin/bash", "-c"]
 HEALTHCHECK --interval=5m --timeout=30s --start-period=10s --retries=3 \
-    CMD ["/bin/bash", "-c", "/healthcheck"]
+    CMD ["/bin/bash", "-c", "/healthcheck", "agentic"]
 ENTRYPOINT [ "/init" ]
 CMD ["/bin/zsh"]

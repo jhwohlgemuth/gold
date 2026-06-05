@@ -13,7 +13,7 @@ LABEL org.opencontainers.image.licenses=MIT
 ARG IMAGE=notebook
 ARG USER_NAME=nonroot
 ARG HOME="/home/${USER_NAME}"
-ARG MAMBA_VERSION=2.6.2
+ARG MAMBA_VERSION=2.7.0
 ARG VERDACCIO_VERSION=6.2.4
 #
 # %environment
