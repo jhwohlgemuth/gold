@@ -2,6 +2,10 @@
 # shellcheck shell=bash
 
 /home/linuxbrew/.linuxbrew/bin/llama-server \
+    --batch-size 2048 \
+    --ubatch-size 2048 \
     --jinja \
+    --sleep-idle-seconds 300 \
     --ssl-key-file "${HOME}/certs/my.key" \
-    --ssl-cert-file "${HOME}/certs/my.pem" >> /etc/services.d/"$1"/log 2>&1
+    --ssl-cert-file "${HOME}/certs/my.pem" \
+    --tools "all" >> /etc/services.d/"$1"/log 2>&1
