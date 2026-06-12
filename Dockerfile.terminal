@@ -61,9 +61,11 @@ RUN /tmp/scripts/install_dependencies.sh \
     && touch /.dockerenv
 USER "${USER_NAME}"
 RUN curl -fsSL https://shell.jasonwohlgemuth.com/install.sh | bash \
+    && curl -s https://ohmyposh.dev/install.sh | bash -s \
     && /usr/bin/pwsh -Command /tmp/scripts/Install-Modules.ps1 \
     && /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
         && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" \
+        && brew trust oven-sh/bun \
         && brew bundle --file /tmp/scripts/Brewfile \
         && brew cleanup --prune=all \
         && eval "$(pkgx integrate)" \

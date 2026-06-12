@@ -1,0 +1,39 @@
+macros:
+  "context_size": "${env.LLAMA_ARG_CTX_SIZE}"
+  "parallel": "${env.LLAMA_ARG_N_PARALLEL}"
+  "models_dir": "${env.HOME}/models"
+  "ssl_key": "${env.HOME}/certs/my.key"
+  "ssl_cert": "${env.HOME}/certs/my.pem"
+models:
+  "smollm2":
+    cmd: |
+      llama-server
+      --context-size 
+      --batch-size 2048
+      --jinja
+      --model ${models_dir}/SmolLM2-135M-Instruct-Q4_K_M.gguf
+      --parallel
+      --port ${PORT}
+      --sleep-idle-seconds 300
+      --ssl-key-file ${ssl_key}
+      --ssl-cert-file ${ssl_cert}
+      --tools all
+      --ubatch-size 2048
+
+  "qwen2.5":
+    cmd: |
+      llama-server
+      --context-size 
+      --batch-size 2048
+      --jinja
+      --model ${models_dir}/Qwen2.5-0.5B-Instruct-Q4_K_M.gguf
+      --parallel
+      --port ${PORT}
+      --sleep-idle-seconds 300
+      --ssl-key-file ${ssl_key}
+      --ssl-cert-file ${ssl_cert}
+      --tools all
+      --ubatch-size 2048
+
+proxy:
+  listen: "0.0.0.0:10732"

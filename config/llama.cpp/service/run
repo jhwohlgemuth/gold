@@ -1,11 +1,6 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 
-/home/linuxbrew/.linuxbrew/bin/llama-server \
-    --batch-size 2048 \
-    --ubatch-size 2048 \
-    --jinja \
-    --sleep-idle-seconds 300 \
-    --ssl-key-file "${HOME}/certs/my.key" \
-    --ssl-cert-file "${HOME}/certs/my.pem" \
-    --tools "all" >> /etc/services.d/"$1"/log 2>&1
+/home/linuxbrew/.linuxbrew/bin/llama-swap \
+    --config /llama-swap.yaml \
+    --listen 0.0.0.0:10732 >> /etc/services.d/"$1"/log 2>&1

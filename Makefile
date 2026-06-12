@@ -29,6 +29,8 @@ lint:
 			hadolint ./Dockerfile.$$image ; \
 		fi; \
     done
+download:
+	@pwsh -NoProfile -File ./scripts/Get-Models.ps1 -Model all -Token "${HF_API_TOKEN}"
 # 	@yamllint .
 #
 # Build tasks
