@@ -13,12 +13,10 @@ models:
     description: "When should the model be used?"
     cmd: |
       llama-server
-      --ctx-size 4096
       --batch-size 2048
       --host 0.0.0.0
       --jinja
       --model ${models_dir}/SmolLM2-135M-Instruct-Q4_K_M.gguf
-      --parallel 2
       --port ${PORT}
       --sleep-idle-seconds 600
       --tools all
@@ -28,13 +26,25 @@ models:
     description: "When should the model be used?"
     cmd: |
       llama-server
-      --ctx-size 4096
       --batch-size 2048
       --host 0.0.0.0
       --jinja
       --model ${models_dir}/Qwen2.5-0.5B-Instruct-Q4_K_M.gguf
-      --parallel 2
       --port ${PORT}
       --sleep-idle-seconds 600
       --tools all
       --ubatch-size 2048
+  "vllm-coder":
+    proxy: "http://127.0.0.1:${PORT}"
+    description: "When should the model be used?"
+    cmd: |
+      podman run
+      --name ${MODEL_ID}
+      --init
+      --rm
+      --device nvidia.com/gpu=all
+      --publish ${PORT}:8000
+      docker.io/vllm/vllm-openai:latest     
+    cmdStop: podman stop ${MODEL_ID}
+    checkEndpoint: "none"
+    ttl: 0
