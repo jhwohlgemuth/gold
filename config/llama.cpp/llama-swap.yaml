@@ -1,3 +1,6 @@
+healthCheckTimeout: 500
+proxy:
+  listen: "http://0.0.0.0:10732"
 macros:
   "context_size": "${env.LLAMA_ARG_CTX_SIZE}"
   "parallel": "${env.LLAMA_ARG_N_PARALLEL}"
@@ -6,34 +9,32 @@ macros:
   "ssl_cert": "${env.HOME}/certs/my.pem"
 models:
   "smollm2":
+    proxy: "http://127.0.0.1:${PORT}"
+    description: "When should the model be used?"
     cmd: |
       llama-server
-      --context-size 
+      --ctx-size 4096
       --batch-size 2048
+      --host 0.0.0.0
       --jinja
       --model ${models_dir}/SmolLM2-135M-Instruct-Q4_K_M.gguf
-      --parallel
+      --parallel 2
       --port ${PORT}
-      --sleep-idle-seconds 300
-      --ssl-key-file ${ssl_key}
-      --ssl-cert-file ${ssl_cert}
+      --sleep-idle-seconds 600
       --tools all
       --ubatch-size 2048
-
   "qwen2.5":
+    proxy: "http://127.0.0.1:${PORT}"
+    description: "When should the model be used?"
     cmd: |
       llama-server
-      --context-size 
+      --ctx-size 4096
       --batch-size 2048
+      --host 0.0.0.0
       --jinja
       --model ${models_dir}/Qwen2.5-0.5B-Instruct-Q4_K_M.gguf
-      --parallel
+      --parallel 2
       --port ${PORT}
-      --sleep-idle-seconds 300
-      --ssl-key-file ${ssl_key}
-      --ssl-cert-file ${ssl_cert}
+      --sleep-idle-seconds 600
       --tools all
       --ubatch-size 2048
-
-proxy:
-  listen: "0.0.0.0:10732"

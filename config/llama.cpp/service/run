@@ -1,6 +1,7 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 
-/home/linuxbrew/.linuxbrew/bin/llama-swap \
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+llama-swap \
     --config /llama-swap.yaml \
     --listen 0.0.0.0:10732 >> /etc/services.d/"$1"/log 2>&1

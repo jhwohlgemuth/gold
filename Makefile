@@ -3,11 +3,17 @@
 include .env
 include .env.secret
 
-prepare: convert lint check
+prepare: convert lint check update-mamba-version
 images: prepare terminal-image notebook-image agentic-image gold-image
 push-all: push-terminal push-notebook push-agentic push-gold
 changelog:
 	@git-cliff --output CHANGELOG.md --github-token ${GITHUB_TOKEN}
+update-mamba-version:
+	@echo "Fetching current micromamba version from Homebrew..."
+	@MAMBA_VERSION=$$(curl -s https://formulae.brew.sh/api/formula/micromamba.json | jq -r '.versions.stable') && \
+	echo "Updating MAMBA_VERSION to $$MAMBA_VERSION in Dockerfile.notebook" && \
+	sed -i "s/ARG MAMBA_VERSION=.*/ARG MAMBA_VERSION=$$MAMBA_VERSION/" Dockerfile.notebook && \
+	echo "MAMBA_VERSION updated successfully"
 check:
 	@for script in $(SCRIPTS) ; do \
 		shfmt --write --list $$script; \
@@ -114,6 +120,7 @@ TARGETS = \
 	check \
 	convert \
 	lint \
+	update-mamba-version \
 	gold-image \
 	terminal-image \
 	notebook-image \
