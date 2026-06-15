@@ -13,6 +13,7 @@ models:
     description: "When should the model be used?"
     cmd: |
       llama-server
+      --offline
       --batch-size 2048
       --host 0.0.0.0
       --jinja
@@ -26,6 +27,7 @@ models:
     description: "When should the model be used?"
     cmd: |
       llama-server
+      --offline
       --batch-size 2048
       --host 0.0.0.0
       --jinja
@@ -42,9 +44,13 @@ models:
       --name ${MODEL_ID}
       --init
       --rm
-      --device nvidia.com/gpu=all
+      --gpus all
       --publish ${PORT}:8000
-      docker.io/vllm/vllm-openai:latest     
+      -v "${env.HOME}/models:/root/models"
+      docker.io/vllm/vllm-openai:latest
+      --model ${models_dir}/Qwen2.5-0.5B-Instruct-Q4_K_M.gguf
+      --port 8000
+      --serving-name vllm-coder
     cmdStop: podman stop ${MODEL_ID}
     checkEndpoint: "none"
     ttl: 0
