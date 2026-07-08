@@ -3,5 +3,5 @@
 
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 llama-swap \
-    --config /llama-swap.yaml \
+    --config "${HOME}/.config/llama-swap/config.yaml" \
     --listen 0.0.0.0:10732 >> /etc/services.d/"$1"/log 2>&1
