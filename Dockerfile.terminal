@@ -32,6 +32,7 @@ ENV VERSION="${VERSION}"
 ENV TZ=America/New_York
 ENV SHELL=/usr/bin/zsh
 ENV TERM=xterm-256color
+ENV PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:${PATH}"
 ENV PATH="${PATH}:${HOME}/.local/bin"
 ENV PATH="${PATH}:${HOME}/.nix-profile/bin"
 ENV PATH="${PATH}:${HOME}/.pixi/bin"
@@ -68,7 +69,6 @@ RUN curl -fsSL https://shell.jasonwohlgemuth.com/install.sh | bash \
         && brew trust oven-sh/bun \
         && brew bundle --file /tmp/scripts/Brewfile \
         && brew cleanup --prune=all \
-        && eval "$(pkgx integrate)" \
     && install_nix \
     && install_ohmyzsh && /tmp/scripts/configure_ohmyzsh.sh \
     && mkdir -p "${HOME}/.ssh" && chmod 700 "${HOME}/.ssh"

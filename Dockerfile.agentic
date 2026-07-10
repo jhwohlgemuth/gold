@@ -37,7 +37,7 @@ ENV MODEL_DIRECTORY="${MODEL_DIRECTORY}"
 # %files
 #
 COPY --chmod=0755 --chown=${USER_NAME}:${USER_NAME} ./config/llama.cpp/service/* /etc/services.d/llama.cpp/
-COPY --chmod=0755 --chown=${USER_NAME}:${USER_NAME} ./config/llama.cpp/llama-swap.yaml "${HOME}/.config/llama-swap/config.yaml"
+COPY --chmod=0755 --chown=${USER_NAME}:${USER_NAME} ./config/llama-swap/config.yaml "${HOME}/.config/llama-swap/config.yaml"
 COPY --chmod=0755 --chown=${USER_NAME}:${USER_NAME} ./provision/agentic/* /tmp/scripts/
 COPY --chmod=0755 --chown=${USER_NAME}:${USER_NAME} ./provision/healthcheck /healthcheck
 #

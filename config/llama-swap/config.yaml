@@ -8,30 +8,15 @@ macros:
   "ssl_key": "${env.HOME}/certs/my.key"
   "ssl_cert": "${env.HOME}/certs/my.pem"
 models:
-  "smollm2":
+  "gpt-oss-20b":
     proxy: "http://127.0.0.1:${PORT}"
-    description: "When should the model be used?"
     cmd: |
       llama-server
       --offline
       --batch-size 2048
       --host 0.0.0.0
       --jinja
-      --model ${models_dir}/SmolLM2-135M-Instruct-Q4_K_M.gguf
-      --port ${PORT}
-      --sleep-idle-seconds 600
-      --tools all
-      --ubatch-size 2048
-  "qwen2.5":
-    proxy: "http://127.0.0.1:${PORT}"
-    description: "When should the model be used?"
-    cmd: |
-      llama-server
-      --offline
-      --batch-size 2048
-      --host 0.0.0.0
-      --jinja
-      --model ${models_dir}/Qwen2.5-0.5B-Instruct-Q4_K_M.gguf
+      --model ${models_dir}/gpt-oss-20b
       --port ${PORT}
       --sleep-idle-seconds 600
       --tools all

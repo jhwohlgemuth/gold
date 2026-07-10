@@ -36,8 +36,8 @@ lint:
 		fi; \
     done
 download:
-	@pwsh -NoProfile -File ./scripts/Get-Models.ps1 -Model all -Token "${HF_API_TOKEN}"
-# 	@yamllint .
+	@pwsh -NoProfile -File ./scripts/Get-Models.ps1 -Model "$(MODELS)" -Token "${HF_API_TOKEN}"
+
 #
 # Build tasks
 #
@@ -119,6 +119,7 @@ TARGETS = \
 	changelog \
 	check \
 	convert \
+	download \
 	lint \
 	update-mamba-version \
 	gold-image \
@@ -129,3 +130,6 @@ TARGETS = \
 	push-notebook \
 	build-image \
 	push-image
+MODELS = \
+	openai/gpt-oss-20b \
+# 	openai/gpt-oss-120b
