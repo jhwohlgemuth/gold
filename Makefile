@@ -4,8 +4,27 @@ include .env
 include .env.secret
 
 prepare: convert lint check update-mamba-version
-images: prepare terminal-image notebook-image agentic-image gold-image
-push-all: push-terminal push-notebook push-agentic push-gold
+images: prepare
+	@for image in $(IMAGES) ; do \
+		$(MAKE) --no-print-directory $$image-image; \
+	done
+images-ornl: prepare
+	@for image in $(IMAGES) ; do \
+		$(MAKE) --no-print-directory $$image-image-ornl; \
+	done
+push-all:
+	@for image in $(IMAGES) ; do \
+		$(MAKE) IMAGE=$$image --no-print-directory push-image; \
+	done
+push-all-ornl:
+	@for image in $(IMAGES) ; do \
+		$(MAKE) \
+			IMAGE=$$image \
+			BUILD_REGISTRY=${REGISTRY_ORNL} \
+			BUILD_PROJECT=${HARBOR_PROJECT} \
+			--no-print-directory \
+			push-image; \
+	done
 changelog:
 	@git-cliff --output CHANGELOG.md --github-token ${GITHUB_TOKEN}
 update-mamba-version:
@@ -49,6 +68,36 @@ notebook-image:
 	@$(MAKE) IMAGE=notebook --no-print-directory build-image
 agentic-image:
 	@$(MAKE) IMAGE=agentic DOCKER_BUILD_SECRETS="--secret id=HF_API_TOKEN,env=HF_API_TOKEN" --no-print-directory build-image
+gold-image-ornl:
+	@$(MAKE) \
+		IMAGE=gold \
+		DOCKERFILE=./Dockerfile \
+		BUILD_REGISTRY=${REGISTRY_ORNL} \
+		BUILD_PROJECT=${HARBOR_PROJECT} \
+		--no-print-directory \
+		build-image
+terminal-image-ornl:
+	@$(MAKE) \
+		IMAGE=terminal \
+		BUILD_REGISTRY=${REGISTRY_ORNL} \
+		BUILD_PROJECT=${HARBOR_PROJECT} \
+		--no-print-directory \
+		build-image
+notebook-image-ornl:
+	@$(MAKE) \
+		IMAGE=notebook \
+		BUILD_REGISTRY=${REGISTRY_ORNL} \
+		BUILD_PROJECT=${HARBOR_PROJECT} \
+		--no-print-directory \
+		build-image
+agentic-image-ornl:
+	@$(MAKE) \
+		IMAGE=agentic \
+		DOCKER_BUILD_SECRETS="--secret id=HF_API_TOKEN,env=HF_API_TOKEN" \
+		BUILD_REGISTRY=${REGISTRY_ORNL} \
+		BUILD_PROJECT=${HARBOR_PROJECT} \
+		--no-print-directory \
+		build-image
 #
 # Push tasks
 #
@@ -60,23 +109,53 @@ push-notebook:
 	@$(MAKE) IMAGE=notebook --no-print-directory push-image
 push-agentic:
 	@$(MAKE) IMAGE=agentic --no-print-directory push-image
+push-gold-ornl:
+	@$(MAKE) \
+		IMAGE=gold \
+		BUILD_REGISTRY=${REGISTRY_ORNL} \
+		BUILD_PROJECT=${HARBOR_PROJECT} \
+		--no-print-directory \
+		push-image
+push-terminal-ornl:
+	@$(MAKE) \
+		IMAGE=terminal \
+		BUILD_REGISTRY=${REGISTRY_ORNL} \
+		BUILD_PROJECT=${HARBOR_PROJECT} \
+		--no-print-directory \
+		push-image
+push-notebook-ornl:
+	@$(MAKE) \
+		IMAGE=notebook \
+		BUILD_REGISTRY=${REGISTRY_ORNL} \
+		BUILD_PROJECT=${HARBOR_PROJECT} \
+		--no-print-directory \
+		push-image
+push-agentic-ornl:
+	@$(MAKE) \
+		IMAGE=agentic \
+		BUILD_REGISTRY=${REGISTRY_ORNL} \
+		BUILD_PROJECT=${HARBOR_PROJECT} \
+		--no-print-directory \
+		push-image
 #
 # Parameterized tasks
 #
 DOCKERFILE ?= ./Dockerfile.${IMAGE}
 DOCKER_BUILD_SECRETS ?=
+BUILD_REGISTRY ?= ${REGISTRY}
+BUILD_PROJECT ?= ${GITHUB_ACTOR}
 build-image:
 	@HF_API_TOKEN="$(HF_API_TOKEN)" docker build \
 		--no-cache \
 		--build-arg VERSION=$(VERSION) \
 		--file ${DOCKERFILE} \
 		${DOCKER_BUILD_SECRETS} \
-		--tag ${REGISTRY}/${GITHUB_ACTOR}/${IMAGE}:$(VERSION) \
+		--tag ${BUILD_REGISTRY}/${BUILD_PROJECT}/${IMAGE}:$(VERSION) \
 		.
-	@docker tag ${REGISTRY}/${GITHUB_ACTOR}/${IMAGE}:$(VERSION) ${REGISTRY}/${GITHUB_ACTOR}/${IMAGE}:latest
+	@docker tag ${BUILD_REGISTRY}/${BUILD_PROJECT}/${IMAGE}:$(VERSION) ${BUILD_REGISTRY}/${BUILD_PROJECT}/${IMAGE}:latest
 push-image:
-	@docker push "${REGISTRY}/${GITHUB_ACTOR}/${IMAGE}:${VERSION}"
-	@docker push "${REGISTRY}/${GITHUB_ACTOR}/${IMAGE}"
+	@docker push "${BUILD_REGISTRY}/${BUILD_PROJECT}/${IMAGE}:${VERSION}"
+	@docker push "${BUILD_REGISTRY}/${BUILD_PROJECT}/${IMAGE}"
 #
 # Build variables
 #
@@ -115,6 +194,7 @@ SCRIPTS = \
 TARGETS = \
 	prepare \
 	images \
+	images-ornl \
 	push-all \
 	changelog \
 	check \
@@ -125,6 +205,11 @@ TARGETS = \
 	gold-image \
 	terminal-image \
 	notebook-image \
+	agentic-image \
+	gold-image-ornl \
+	terminal-image-ornl \
+	notebook-image-ornl \
+	agentic-image-ornl \
 	push-gold \
 	push-terminal \
 	push-notebook \
