@@ -13,7 +13,7 @@ LABEL org.opencontainers.image.licenses=MIT
 ARG IMAGE=agentic
 ARG USER_NAME=nonroot
 ARG HOME="/home/${USER_NAME}"
-ARG MODEL_DIRECTORY="${HOME}/models"
+ARG MODEL_DIRECTORY="${HOME}/.models"
 ARG CONTEXT_SIZE=0
 ARG PORT=10732
 #

@@ -4,7 +4,7 @@ proxy:
 macros:
   "context_size": "${env.LLAMA_ARG_CTX_SIZE}"
   "parallel": "${env.LLAMA_ARG_N_PARALLEL}"
-  "models_dir": "${env.HOME}/models"
+  "models_dir": "${env.HOME}/.models"
   "ssl_key": "${env.HOME}/certs/my.key"
   "ssl_cert": "${env.HOME}/certs/my.pem"
 models:
