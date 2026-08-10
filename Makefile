@@ -54,9 +54,6 @@ lint:
 			hadolint ./Dockerfile.$$image ; \
 		fi; \
     done
-download:
-	@pwsh -NoProfile -File ./scripts/Get-Models.ps1 -Model "$(MODELS)" -Token "${HF_API_TOKEN}"
-
 #
 # Build tasks
 #
@@ -66,8 +63,6 @@ terminal-image:
 	@$(MAKE) IMAGE=terminal --no-print-directory build-image
 notebook-image:
 	@$(MAKE) IMAGE=notebook --no-print-directory build-image
-agentic-image:
-	@$(MAKE) IMAGE=agentic DOCKER_BUILD_SECRETS="--secret id=HF_API_TOKEN,env=HF_API_TOKEN" --no-print-directory build-image
 gold-image-ornl:
 	@$(MAKE) \
 		IMAGE=gold \
@@ -90,14 +85,6 @@ notebook-image-ornl:
 		BUILD_PROJECT=${HARBOR_PROJECT} \
 		--no-print-directory \
 		build-image
-agentic-image-ornl:
-	@$(MAKE) \
-		IMAGE=agentic \
-		DOCKER_BUILD_SECRETS="--secret id=HF_API_TOKEN,env=HF_API_TOKEN" \
-		BUILD_REGISTRY=${REGISTRY_ORNL} \
-		BUILD_PROJECT=${HARBOR_PROJECT} \
-		--no-print-directory \
-		build-image
 #
 # Push tasks
 #
@@ -107,8 +94,6 @@ push-terminal:
 	@$(MAKE) IMAGE=terminal --no-print-directory push-image
 push-notebook:
 	@$(MAKE) IMAGE=notebook --no-print-directory push-image
-push-agentic:
-	@$(MAKE) IMAGE=agentic --no-print-directory push-image
 push-gold-ornl:
 	@$(MAKE) \
 		IMAGE=gold \
@@ -130,26 +115,17 @@ push-notebook-ornl:
 		BUILD_PROJECT=${HARBOR_PROJECT} \
 		--no-print-directory \
 		push-image
-push-agentic-ornl:
-	@$(MAKE) \
-		IMAGE=agentic \
-		BUILD_REGISTRY=${REGISTRY_ORNL} \
-		BUILD_PROJECT=${HARBOR_PROJECT} \
-		--no-print-directory \
-		push-image
 #
 # Parameterized tasks
 #
 DOCKERFILE ?= ./Dockerfile.${IMAGE}
-DOCKER_BUILD_SECRETS ?=
 BUILD_REGISTRY ?= ${REGISTRY}
 BUILD_PROJECT ?= ${GITHUB_ACTOR}
 build-image:
-	@HF_API_TOKEN="$(HF_API_TOKEN)" docker build \
+	@docker build \
 		--no-cache \
 		--build-arg VERSION=$(VERSION) \
 		--file ${DOCKERFILE} \
-		${DOCKER_BUILD_SECRETS} \
 		--tag ${BUILD_REGISTRY}/${BUILD_PROJECT}/${IMAGE}:$(VERSION) \
 		.
 	@docker tag ${BUILD_REGISTRY}/${BUILD_PROJECT}/${IMAGE}:$(VERSION) ${BUILD_REGISTRY}/${BUILD_PROJECT}/${IMAGE}:latest
@@ -162,7 +138,6 @@ push-image:
 IMAGES = \
 	terminal \
 	notebook \
-	agentic \
 	gold
 FILES = \
 	./.shellcheckrc \
@@ -172,9 +147,6 @@ FILES = \
 	./config/code-server/service/run \
 	./config/jupyter/service/finish \
 	./config/jupyter/service/run \
-	./config/llama.cpp/service/finish \
-	./config/llama.cpp/service/log \
-	./config/llama.cpp/service/run \
 	./config/marimo/service/finish \
 	./config/marimo/service/log \
 	./config/marimo/service/run \
@@ -183,7 +155,6 @@ FILES = \
 	./config/verdaccio/service/run
 SCRIPTS = \
 	./provision/healthcheck \
-	./provision/agentic/build_llama_cpp_from_source.sh \
 	./provision/terminal/configure_locale.sh \
 	./provision/terminal/configure_ohmyzsh.sh \
 	./provision/terminal/create_nonroot_user.sh \
@@ -199,22 +170,16 @@ TARGETS = \
 	changelog \
 	check \
 	convert \
-	download \
 	lint \
 	update-mamba-version \
 	gold-image \
 	terminal-image \
 	notebook-image \
-	agentic-image \
 	gold-image-ornl \
 	terminal-image-ornl \
 	notebook-image-ornl \
-	agentic-image-ornl \
 	push-gold \
 	push-terminal \
 	push-notebook \
 	build-image \
 	push-image
-MODELS = \
-	openai/gpt-oss-20b \
-# 	openai/gpt-oss-120b

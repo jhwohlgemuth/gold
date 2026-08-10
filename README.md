@@ -71,6 +71,11 @@ The following environment variables are available to customize containers:
 > [!TIP]
 > See [ARCHITECTURE.md](./ARCHITECTURE.md)
 
+## Related Projects
+
+- [Goldsmith](./goldsmith/README.md) is the independently branded agentic
+  development environment that originated in Gold.
+
 ## Contributing
 > [!TIP]
 > See [CONTRIBUTING.md](./.github/CONTRIBUTING.md)

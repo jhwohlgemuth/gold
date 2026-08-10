@@ -8,6 +8,3 @@ space_redirects    = true
 
 [provision/healthcheck]
 shell_variant      = bash
-
-[provision/agentic/*.sh]
-shell_variant      = bash

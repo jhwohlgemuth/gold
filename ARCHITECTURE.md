@@ -22,6 +22,13 @@ graph LR
     notebook --> gold
 ```
 
+## Related Environments
+
+[Goldsmith](./goldsmith/README.md), formerly Gold's agentic image, is maintained
+as a separate product. Its initial release consumes a pinned Notebook image as a
+documented base-image dependency while keeping its versioning, runtime services,
+and release lifecycle independent from Gold.
+
 -------------
 
 ## Footnotes
