@@ -132,6 +132,7 @@ build-image:
 push-image:
 	@docker push "${BUILD_REGISTRY}/${BUILD_PROJECT}/${IMAGE}:${VERSION}"
 	@docker push "${BUILD_REGISTRY}/${BUILD_PROJECT}/${IMAGE}"
+
 #
 # Build variables
 #
@@ -152,7 +153,9 @@ FILES = \
 	./config/marimo/service/run \
 	./config/verdaccio/service/finish \
 	./config/verdaccio/service/log \
-	./config/verdaccio/service/run
+	./config/verdaccio/service/run \
+	./config/mcp-lean/service/finish \
+	./config/mcp-lean/service/run
 SCRIPTS = \
 	./provision/healthcheck \
 	./provision/terminal/configure_locale.sh \

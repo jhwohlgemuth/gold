@@ -67,6 +67,19 @@ The following environment variables are available to customize containers:
 > [!TIP]
 > Change environment variables with the `--env` parameter <sup>[4](#4)</sup> (ex. `docker run -it --env CODE_SERVER_PORT=8080 <image>`)
 
+## Lean MCP Service
+
+Gold runs the Lean LSP MCP server as an s6 service alongside code-server, Jupyter, Marimo and Verdaccio (migrated from Goldsmith's `mcp-lean` sidecar).
+
+- **Service**: `/etc/services.d/mcp-lean` (`config/mcp-lean/service/run` — `lean-lsp-mcp --transport streamable-http --host 0.0.0.0 --port 11005`)
+- **Image**: `ghcr.io/jhwohlgemuth/gold` now embeds `lean-lsp-mcp==0.30.0` via `uv==0.8.22` (see `Dockerfile:16,42`) and reuses `nixpkgs.elan`
+- **Endpoint**: `http://127.0.0.1:11005/mcp` (published `EXPOSE 11005:11005`, in-container `http://127.0.0.1:11005/mcp`)
+- **Env**: `LEAN_PROJECT_PATH` (default `~/dev` → `/home/nonroot/dev`, must contain `lean-toolchain` + `lakefile.lean|toml` for per-project mode), `MCP_LEAN_PORT`/`MCP_LEAN_HOST`, `LEAN_LOG_LEVEL` (default `INFO`)
+- **Client config**: `http://127.0.0.1:11005/mcp` (see `config/agents/opencode.json:4` and `config/agents/codex.toml:3`)
+- **Healthcheck**: `provision/healthcheck:40` probes `http://localhost:${MCP_LEAN_PORT}/mcp` (non-`--fail` GET, because Streamable HTTP returns 4xx when healthy)
+
+Run `docker run -p 11005:11005 ghcr.io/jhwohlgemuth/gold` and the MCP is available without an extra Compose profile.
+
 ## Architecture
 > [!TIP]
 > See [ARCHITECTURE.md](./ARCHITECTURE.md)

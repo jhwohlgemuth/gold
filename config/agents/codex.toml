@@ -1,0 +1,5 @@
+# Lean LSP MCP (opt-in --profile formal)
+# In-network: http://mcp-lean:8000/mcp  Host: http://127.0.0.1:11005/mcp
+[mcp_servers.lean]
+url = "http://mcp-lean:8000/mcp"
+enabled = false

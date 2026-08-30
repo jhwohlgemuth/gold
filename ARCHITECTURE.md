@@ -22,12 +22,29 @@ graph LR
     notebook --> gold
 ```
 
+## Lean MCP Service
+
+`config/mcp-lean/service` defines the s6 service `mcp-lean` (lean-lsp-mcp 0.30.0 via `uv 0.8.22`, `Dockerfile:16,34`). It runs alongside `code-server`, `jupyter`, `marimo` and `verdaccio` under s6-overlay (`/etc/services.d/mcp-lean`), listening on `MCP_LEAN_PORT=11005` (streamable-http, `LEAN_PROJECT_PATH`, `LEAN_LOG_LEVEL`). The image already ships `nixpkgs.elan`, so no sidecar or `lean-cache`/`elan` volumes are needed.
+
 ## Related Environments
 
 [Goldsmith](./goldsmith/README.md), formerly Gold's agentic image, is maintained
 as a separate product. Its initial release consumes a pinned Notebook image as a
 documented base-image dependency while keeping its versioning, runtime services,
-and release lifecycle independent from Gold.
+and release lifecycle independent from Gold. Formal verification (Lean LSP MCP, formerly Goldsmith's `mcp-lean --profile formal` sidecar) now lives in Gold as an s6 service alongside code-server/Jupyter.
+
+## Service Topology
+
+```mermaid
+graph LR
+    subgraph Gold["Gold container / s6"]
+        Code["code-server :1337"]
+        Jupyter["jupyter :13337"]
+        Marimo["marimo :13338"]
+        Verdaccio["verdaccio :4873"]
+        Lean["mcp-lean :11005"]
+    end
+```
 
 -------------
 
