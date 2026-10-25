@@ -63,7 +63,7 @@ RUN /tmp/scripts/install_dependencies.sh \
 USER "${USER_NAME}"
 RUN curl -fsSL https://shell.jasonwohlgemuth.com/install.sh | bash \
     && curl -s https://ohmyposh.dev/install.sh | bash -s \
-    && /usr/bin/pwsh -Command /tmp/scripts/Install-Modules.ps1 \
+    && pwsh -Command /tmp/scripts/Install-Modules.ps1 \
     && /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
         && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" \
         && brew trust oven-sh/bun \
@@ -75,12 +75,13 @@ RUN curl -fsSL https://shell.jasonwohlgemuth.com/install.sh | bash \
 USER root
 RUN /tmp/scripts/configure_locale.sh \
     && ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime && echo "${TZ}" > /etc/timezone \
+    && case "$(dpkg --print-architecture)" in amd64) s6_arch=x86_64 ;; arm64) s6_arch=aarch64 ;; *) exit 1 ;; esac \
     && curl -fsSL "${S6_OVERLAY_GITHUB}/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz" -o /tmp/s6-overlay-noarch.tar.xz \
-    && curl -fsSL "${S6_OVERLAY_GITHUB}/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz" -o /tmp/s6-overlay-x86_64.tar.xz \
+    && curl -fsSL "${S6_OVERLAY_GITHUB}/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${s6_arch}.tar.xz" -o /tmp/s6-overlay-arch.tar.xz \
     && curl -fsSL "${S6_OVERLAY_GITHUB}/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-noarch.tar.xz" -o /tmp/s6-overlay-symlinks-noarch.tar.xz \
     && curl -fsSL "${S6_OVERLAY_GITHUB}/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-arch.tar.xz" -o /tmp/s6-overlay-symlinks-arch.tar.xz \
     && tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz \
-    && tar -C / -Jxpf /tmp/s6-overlay-x86_64.tar.xz \
+    && tar -C / -Jxpf /tmp/s6-overlay-arch.tar.xz \
     && tar -C / -Jxpf /tmp/s6-overlay-symlinks-noarch.tar.xz \
     && tar -C / -Jxpf /tmp/s6-overlay-symlinks-arch.tar.xz \
     && cleanup

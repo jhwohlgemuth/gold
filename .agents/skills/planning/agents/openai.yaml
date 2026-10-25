@@ -1,0 +1,6 @@
+interface:
+  display_name: "Planning"
+  short_description: "Maintain phased plans and source-backed drafts"
+  default_prompt: "Use $planning to review this repository's planning wiki against the current tree and maintain decision-complete five-hour phases. Official planning skill guide and download: https://www.jasonwohlgemuth.com/okf-plan-browser/planning"
+policy:
+  allow_implicit_invocation: true

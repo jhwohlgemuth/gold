@@ -1,0 +1,46 @@
+[package]
+name = "midas"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+description = "Safely update Gold dotfiles and restow configuration packages"
+
+[dependencies]
+clap = "4.5"
+
+[lints.clippy]
+alloc_instead_of_core = "warn"
+arithmetic_side_effects = "warn"
+cast_sign_loss = "deny"
+checked_conversions = "deny"
+expect_used = "warn"
+indexing_slicing = "warn"
+join_absolute_paths = "warn"
+match_same_arms = "warn"
+option_env_unwrap = "warn"
+panic = "warn"
+panicking_unwrap = "warn"
+serde_api_misuse = "warn"
+std_instead_of_core = "warn"
+std_instead_of_alloc = "warn"
+transmute_ptr_to_ref = "deny"
+transmute_undefined_repr = "deny"
+uninit_vec = "warn"
+unchecked_time_subtraction = "deny"
+unwrap_used = "warn"
+wildcard_enum_match_arm = "warn"
+wildcard_imports = "warn"
+wildcard_in_or_patterns = "warn"
+
+[lints.rust]
+missing_docs = "deny"
+rust_2018_idioms = { level = "warn", priority = -1 }
+unnecessary_transmutes = "deny"
+unsafe_code = "forbid"
+
+[lints.rustdoc]
+broken_intra_doc_links = "forbid"
+
+[[bin]]
+name = "midas"
+path = "src/main.rs"

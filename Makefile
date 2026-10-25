@@ -1,13 +1,11 @@
 #!make
-.PHONY: $(TARGETS)
 include .env
-include .env.secret
+-include .env.secret
 
 prepare: convert lint check update-mamba-version
-images: prepare
-	@for image in $(IMAGES) ; do \
-		$(MAKE) --no-print-directory $$image-image; \
-	done
+images: images-amd64 images-arm64
+images-amd64: prepare terminal-image-amd64 notebook-image-amd64 gold-image-amd64
+images-arm64: prepare notebook-image-arm64
 images-ornl: prepare
 	@for image in $(IMAGES) ; do \
 		$(MAKE) --no-print-directory $$image-image-ornl; \
@@ -29,10 +27,9 @@ changelog:
 	@git-cliff --output CHANGELOG.md --github-token ${GITHUB_TOKEN}
 update-mamba-version:
 	@echo "Fetching current micromamba version from Homebrew..."
-	@MAMBA_VERSION=$$(curl -s https://formulae.brew.sh/api/formula/micromamba.json | jq -r '.versions.stable') && \
-	echo "Updating MAMBA_VERSION to $$MAMBA_VERSION in Dockerfile.notebook" && \
-	sed -i "s/ARG MAMBA_VERSION=.*/ARG MAMBA_VERSION=$$MAMBA_VERSION/" Dockerfile.notebook && \
-	echo "MAMBA_VERSION updated successfully"
+	@bash -euo pipefail -c 'version=$$(curl -fsSL https://formulae.brew.sh/api/formula/micromamba.json | jq -er ".versions.stable + (if .revision > 0 then \"_\" + (.revision | tostring) else \"\" end)"); \
+		perl -pi -e "s/^ARG MAMBA_VERSION=.*/ARG MAMBA_VERSION=$$version/" Dockerfile.notebook; \
+		echo "Updated MAMBA_VERSION to $$version in Dockerfile.notebook"'
 check:
 	@for script in $(SCRIPTS) ; do \
 		shfmt --write --list $$script; \
@@ -57,12 +54,20 @@ lint:
 #
 # Build tasks
 #
-gold-image:
-	@$(MAKE) IMAGE=gold DOCKERFILE=./Dockerfile --no-print-directory build-image
+gold-image-amd64: notebook-image-amd64
+	@$(MAKE) IMAGE=gold DOCKERFILE=./Dockerfile BUILD_PLATFORM=linux/amd64 --no-print-directory build-image
+terminal-image-amd64:
+	@$(MAKE) IMAGE=terminal BUILD_PLATFORM=linux/amd64 --no-print-directory build-image
+notebook-image-amd64: terminal-image-amd64
+	@$(MAKE) IMAGE=notebook BUILD_PLATFORM=linux/amd64 --no-print-directory build-image
+terminal-image-arm64:
+	@$(MAKE) IMAGE=terminal BUILD_PLATFORM=linux/arm64 --no-print-directory build-image
+notebook-image-arm64: terminal-image-arm64
+	@$(MAKE) IMAGE=notebook BUILD_PLATFORM=linux/arm64 --no-print-directory build-image
 terminal-image:
-	@$(MAKE) IMAGE=terminal --no-print-directory build-image
+	@docker buildx build --platform linux/amd64,linux/arm64 --build-arg VERSION=$(VERSION) --file Dockerfile.terminal --tag ${REGISTRY}/${GITHUB_ACTOR}/terminal:$(VERSION) --push .
 notebook-image:
-	@$(MAKE) IMAGE=notebook --no-print-directory build-image
+	@docker buildx build --platform linux/amd64,linux/arm64 --build-arg VERSION=$(VERSION) --file Dockerfile.notebook --tag ${REGISTRY}/${GITHUB_ACTOR}/notebook:$(VERSION) --push .
 gold-image-ornl:
 	@$(MAKE) \
 		IMAGE=gold \
@@ -121,8 +126,10 @@ push-notebook-ornl:
 DOCKERFILE ?= ./Dockerfile.${IMAGE}
 BUILD_REGISTRY ?= ${REGISTRY}
 BUILD_PROJECT ?= ${GITHUB_ACTOR}
+BUILD_PLATFORM ?= linux/amd64
 build-image:
 	@docker build \
+		--platform ${BUILD_PLATFORM} \
 		--no-cache \
 		--build-arg VERSION=$(VERSION) \
 		--file ${DOCKERFILE} \
@@ -163,26 +170,37 @@ SCRIPTS = \
 	./provision/terminal/create_nonroot_user.sh \
 	./provision/terminal/install_dependencies.sh \
 	./provision/terminal/install_dotnet.sh \
+	./provision/notebook/install_conda.sh \
 	./provision/notebook/install_dependencies.sh \
 	./provision/gold/install_dependencies.sh
-TARGETS = \
-	prepare \
-	images \
-	images-ornl \
-	push-all \
+.PHONY: \
+	build-image \
 	changelog \
 	check \
 	convert \
-	lint \
-	update-mamba-version \
-	gold-image \
-	terminal-image \
-	notebook-image \
+	gold-image-amd64 \
 	gold-image-ornl \
-	terminal-image-ornl \
+	images \
+	images-amd64 \
+	images-arm64 \
+	images-ornl \
+	lint \
+	notebook-image-amd64 \
+	notebook-image-arm64 \
+	notebook-image \
 	notebook-image-ornl \
+	prepare \
+	push-all \
+	push-all-ornl \
 	push-gold \
-	push-terminal \
+	push-gold-ornl \
+	push-image \
 	push-notebook \
-	build-image \
-	push-image
+	push-notebook-ornl \
+	push-terminal \
+	push-terminal-ornl \
+	terminal-image-amd64 \
+	terminal-image-arm64 \
+	terminal-image \
+	terminal-image-ornl \
+	update-mamba-version

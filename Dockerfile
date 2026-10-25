@@ -62,7 +62,7 @@ RUN curl -sSf https://sh.rustup.rs | bash -s -- -y \
     && . "${HOME}/.cargo/env" \
     && rustup toolchain install nightly \
     && rustup target add x86_64-unknown-linux-musl \
-    && cargo install \
+    && cargo install --locked \
         evcxr_repl \
         evcxr_jupyter \
     && evcxr_jupyter --install
@@ -72,7 +72,7 @@ RUN nix-env -iA \
     && elan default "leanprover/lean4:${LEAN_VERSION}" \
     && install_rocq
 USER root
-RUN pip install --no-cache-dir "uv==${UV_VERSION}" \
+RUN pip install --break-system-packages --no-cache-dir "uv==${UV_VERSION}" \
     && install -d "${UV_TOOL_DIR}" \
     && uv tool install "lean-lsp-mcp==${LEAN_LSP_MCP_VERSION}" \
     && chown -R "${USER_NAME}:${USER_NAME}" "${UV_TOOL_DIR}" \

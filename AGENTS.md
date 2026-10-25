@@ -155,9 +155,14 @@ The Gold project uses GNU Make for common development tasks. The Makefile includ
 
 **Image Building:**
 - `make images` - Build all images (terminal, notebook, gold)
-- `make terminal-image` - Build Terminal image only
-- `make notebook-image` - Build Notebook image only
-- `make gold-image` - Build Gold image with version tag
+- `make terminal-image-amd64` - Build the Terminal amd64 image
+- `make notebook-image-amd64` - Build the Notebook amd64 image
+- `make gold-image-amd64` - Build the Gold amd64 image
+- `make terminal-image-arm64` - Build the Terminal arm64 image
+- `make notebook-image-arm64` - Build Terminal and Notebook arm64 images
+- `make images-arm64` - Build the Terminal and Notebook arm64 images
+- `make terminal-image` - Build and publish the multiarch Terminal image
+- `make notebook-image` - Build and publish the multiarch Notebook image
 
 **Publishing:**
 - `make push-all` - Push all images to container registry
@@ -175,7 +180,7 @@ The Gold project uses GNU Make for common development tasks. The Makefile includ
 make prepare
 
 # Build and test a specific image
-make terminal-image
+make terminal-image-amd64
 
 # Generate changelog (requires GITHUB_TOKEN environment variable)
 make changelog
