@@ -1,68 +1,52 @@
-# Implementation — access, CI, and entry documentation
+# Implementation — Jupyter credentials (AD-02)
 
-- Authorized scope: AD-01, CI-01, and DOC-01 only, executed in parallel with separate file ownership. AD-02 and CI-02 remain future work.
-- Baseline: clean worktree at `5000ee6`; branch `feat/access-ci-docs` starts from `main` because no local or origin tracking `develop` branch exists. Changes remain uncommitted and unpublished.
-- Active plans: [access defaults](.wiki/features/access-defaults.md) and [CI validation](.wiki/features/ci-validation.md). DOC-01 is retired; durable outcomes are in README, ARCHITECTURE, and the release agent configuration.
-- State: AD-01 and DOC-01 complete; CI-01 implementation locally validated and waiting on its first GitHub PR run. Full `/init`/s6 smoke validation remains unverified; focused real-server login checks passed.
-- Budget: estimated less than one active hour per selected phase; each has a five-hour maximum. External waiting does not consume active phase time.
+- Authorized scope: AD-02, plus reconciliation of completed CI-01 evidence. CI-02 and the image/CLI phases remain future work.
+- Baseline: clean `main` at `cc1af0d`, merging PR #7; implementation branch `feat/jupyter-credentials`. Changes remain uncommitted and unpublished.
+- State: AD-02 complete; the access-defaults plan is retired. The portfolio now contains three executable plans. Next phase: [CI-02](.wiki/features/ci-validation.md).
+- Product write set: `config/jupyter/jupyter_notebook_config.py`, `config/jupyter/service/run`, `README.md`.
+- Budget: estimated less than one active hour of the five-hour maximum; external waiting excluded.
 
-## Authentication evidence
+## Implemented behavior
 
-The code-server service requires a nonempty `CODE_SERVER_PASSWORD` or `CODE_SERVER_PASSWORD_HASH`, uses native credential environment variables, forces password authentication, and preserves custom configuration without secret interpolation. Supplied hashes win over plaintext. A custom configuration hash also wins over plaintext, as documented in README. Jupyter retains its existing default until AD-02.
+Jupyter requires `JUPYTER_PASSWORD` or `JUPYTER_PASSWORD_HASH`; a supplied hash wins when both are set. Its shipped config loads an optional custom Python config, then applies the environment credential and disables token login and login-page password changes. Plaintext is hashed in memory and removed from Jupyter's environment; the hash remains available for extension config reloads. Custom files and the shipped config are not rewritten, and secrets are not passed as process arguments. Missing credentials and invalid custom-config paths prevent service startup with visible errors.
 
-Changed paths: `config/code-server/config.yaml`, `config/code-server/service/run`, `config/code-server/service/finish`. README quick-start alignment was included in DOC-01 to keep the new startup contract usable.
+The service directly launches the base environment's `jupyter` executable so s6 receives its output and can deliver signals. README documents both browser login URLs, required environment variables, credential precedence, and interactive hash generation.
 
-On 2026-11-11, actual HTTPS login checks passed on Docker context `oklahoma`, Notebook `1.0.5-amd64`, image `sha256:bab8ca98f4198de9f69e927718a1aac5775061acbdd174a43c7ec6549c490677`, code-server `4.143.1`, with the changed config and run script copied into a disposable container:
+## Validation evidence
 
-- Missing/empty credentials failed before launching the server, including when ambient native password variables were present.
-- A password containing punctuation and a newline worked without configuration rewriting.
-- Unauthenticated requests redirected to login; wrong/default passwords received no session cookie; correct credentials received a cookie and access to an authenticated route.
-- Hash precedence, custom `auth: none` being overridden, custom hash precedence, and a supplied hash overriding the custom hash all passed.
-- The shipped config checksum was unchanged.
+All results below apply to this branch's current uncommitted product files. On 2026-11-11 local time, a disposable derivative was built on Docker context `oklahoma` from `ghcr.io/jhwohlgemuth/notebook:1.0.5-amd64`, base image `sha256:bab8ca98f4198de9f69e927718a1aac5775061acbdd174a43c7ec6549c490677`, with only the changed browser service/config files and the temporary test harness copied in. Tested derivative ID: `sha256:c4278f33ddbeda00722edd3ab745a875b0b879b5fb185aa45f7daeb953fe5b07`. Installed Jupyter Server: 2.21.1; code-server: 4.143.1.
 
-Temporary reproduction harness: `/tmp/gold-ad01-test/check.sh`; it runs the changed service using `CODE_SERVER_CONFIG`, `CODE_SERVER_PORT=14437`, and temporary test credentials, and probes `/healthz`, `/`, and `/login` with curl. This validates the existing image with changed service files, not a fresh full-image build or the architecture matrix.
+Seven scenarios passed in fresh containers using the normal `/init` entrypoint and s6 supervision:
 
-```sh
-tar -cf - -C config/code-server config.yaml -C service run \
-  -C /tmp/gold-ad01-test check.sh |
-docker --context oklahoma run --rm -i --entrypoint /bin/bash \
-  ghcr.io/jhwohlgemuth/notebook:1.0.5-amd64 \
-  -c 'mkdir -p /tmp/gold-ad01; tar -xf - -C /tmp/gold-ad01; bash /tmp/gold-ad01/check.sh'
-```
+- Plaintext containing punctuation and a newline: supplied logins work on ports 1337 and 13337.
+- Hash plus plaintext: the hash wins and the ignored plaintext is rejected.
+- Hash only: the existing `JUPYTER_PASSWORD_HASH` path works without a plaintext variable.
+- Custom config: its base URL is preserved; its old password and token cannot log in; the supplied credential works; the service port takes precedence over the custom-config port.
+- Missing credentials: both browser ports remain unavailable and startup errors identify the required variables.
+- Empty credentials: same fail-closed result.
+- Missing custom-config file: Jupyter remains unavailable and logs the configuration error.
 
-A separate full `/init`/s6 test using `/tmp/gold-ad01-test/check-s6.sh` was interrupted after 224 seconds without a result. It establishes neither a pass nor a defect. The earlier login container exited successfully with `--rm`; afterward `docker --context oklahoma ps -a --no-trunc` confirmed no remaining containers. Normal supervisor startup remains a verification item for AD-02's fresh-container checks.
+For successful-start scenarios, unauthenticated/wrong/default-password requests were rejected; accepted credentials established a session and authenticated access. Jupyter's protected API rejected the stale custom token. Checksums confirmed shipped configuration files were unchanged. No config-load exceptions occurred after the reload fix. This also resolves the previous unverified normal-s6-startup check; it does not establish full source image builds or the architecture matrix.
 
-## CI evidence and recovery
-
-Changed path: `.github/workflows/validate.yml`. Jobs: **Shell validation**, **Dockerfile validation**, **Configuration validation**. PR/manual triggers, read-only contents permission, SHA-pinned actions, checksum-verified binary downloads, and fixed tool versions are implemented. Shell checks cover the existing provision scope and code-server run/finish scripts. Hadolint warnings/errors fail while informational diagnostics remain visible. Checkov uses `--hard-fail-on '*'` and `CKV_PARSE_ERROR_FAIL=true` to override local soft-fail and reject parse errors.
-
-Local commands passed against the uncommitted implementation:
+Focused checks passed:
 
 ```sh
-/tmp/gold-ci-actionlint/actionlint .github/workflows/validate.yml
-ruby -ryaml -e 'p YAML.load_file(".github/workflows/validate.yml")["jobs"].keys'
-/tmp/gold-ci-shfmt -d provision/healthcheck provision/terminal/*.sh provision/notebook/*.sh provision/gold/*.sh
-/tmp/gold-ci-shfmt -d config/code-server/service/run config/code-server/service/finish
-shellcheck provision/healthcheck provision/terminal/*.sh provision/notebook/*.sh provision/gold/*.sh
-shellcheck --shell=bash config/code-server/service/run
-shellcheck config/code-server/service/finish
-hadolint --failure-threshold warning Dockerfile Dockerfile.terminal Dockerfile.notebook
-CKV_PARSE_ERROR_FAIL=true UV_TOOL_DIR=/tmp/gold-ci-uv-tools uv --cache-dir /tmp/gold-ci-uv-cache tool run --python /opt/homebrew/bin/python3.11 --from checkov==3.2.471 checkov --config-file .checkov.yaml --hard-fail-on '*' --skip-download
+shfmt -d config/jupyter/service/run
+shellcheck config/jupyter/service/run
+python3 -B .agents/skills/planning/scripts/validate_wiki.py .
+git diff --check
 ```
 
-Versions: actionlint 1.7.7, shfmt 3.12.0, ShellCheck 0.11.0, Hadolint 2.15.1, Checkov 3.2.471. Checkov passed 589 Dockerfile and 84 Actions checks. Hadolint retained seven existing informational DL3066 diagnostics. Deliberate temporary Hadolint warning and Checkov defect fixtures both exited 1. `--hard-fail-on ALL` was tested and did not override soft-fail; the implemented quoted wildcard did.
+Python AST parsing and README local-link checks passed. Checkov 3.2.471 with `CKV_PARSE_ERROR_FAIL=true`, `--hard-fail-on '*'`, and `--skip-download` passed 589 Dockerfile and 84 Actions checks with zero failures.
 
-Local Checkov used Python 3.11 on macOS; CI specifies Python 3.12.11 on Ubuntu 24.04. This environment difference, Linux binary execution, and GitHub event/status behavior remain for CI-01's first PR run. Action pins were checked against GitHub tag refs for `actions/checkout` v4.3.1 and `actions/setup-python` v5.6.0; binary checksums against official release asset digests for `mvdan/sh` v3.12.0, `koalaman/shellcheck` v0.11.0, and `hadolint/hadolint` v2.15.1.
+Temporary reproduction assets are `/tmp/gold-ad02-runtime-check.py`, `/tmp/gold-ad02-http-check.py`, and build context `/var/folders/j8/zdr2cnr934x80qdkddy48nshjhbsm8/T/gold-ad02-cy3ezrgo`. Rebuild the disposable `gold-ad02-validation:cy3ezrgo` image from that context on `oklahoma`, then run the runtime-check script from the repository root. The script creates and removes each scenario container. These are temporary execution artifacts, not a committed test suite.
 
-## Documentation evidence
+Cleanup is complete: the initial test containers and the final disposable image tag were removed; a name-filtered container listing returned no remaining AD-02 containers.
 
-Changed paths: `README.md`, `ARCHITECTURE.md`, `.github/agents/release.yml`. Removed missing local examples/Goldsmith destinations, preserved Goldsmith context without an unverified URL, documented architecture targets and local-versus-publishing behavior, and corrected `gold-image` to `gold-image-amd64`.
+An initial `docker cp` attempt failed because the Mac UID could not map into rootless Docker's user namespace. Packaging the harness with explicit Linux ownership resolved it. The product config also needed to retain its computed hash for repeated extension loads; the final seven scenarios validate that correction.
 
-Local Markdown paths and anchors resolve; release-agent YAML parses; every referenced Make target exists; `make -n gold-image-amd64` succeeds and shows Terminal → Notebook → Gold. `git diff --check`, actionlint, and the wiki validator passed after integration. No full image build or publishing was performed.
+## CI evidence and next action
 
-## Remaining cursor
+PR #7 merged as `cc1af0d`. At `2fbb4ad`, all three jobs passed in [run 43133232599](https://github.com/jhwohlgemuth/gold/actions/runs/43133232599): **Shell validation**, **Dockerfile validation**, **Configuration validation**. SonarCloud reported zero new issues after HTTPS-only downloads and wheel-only Checkov installation. CI-01 is removed and CI-02 is ready.
 
-- AD-01 was pruned after its focused credential/login checks passed; AD-02 is ready and remains outside this request. Its fresh-container tests must also verify normal supervisor startup.
-- CI-01 is blocked on publishing this branch and opening a PR, then recording a passing run and exact status names. CI-02 follows that evidence and remains outside this request.
-- The portfolio now contains four executable plans. Image-builder availability evidence was corrected: local Docker is unavailable but remote builders advertise the required platforms; no architecture-matrix phase was executed.
-- Next action: publish the implementation branch and open a PR, then inspect all three validation jobs, record the run URL, and finish CI-01. If checks expose defects, define a bounded repair phase rather than widening the original work silently.
+Next action: review/commit the AD-02 changes, then execute CI-02 to document the exact required checks and inspect branch-protection status. No future run has been scheduled.

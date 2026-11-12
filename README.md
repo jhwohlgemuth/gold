@@ -9,17 +9,19 @@
 Use VS Code in the browser in **Three Easy Steps™**
 
 1. Install [Docker](https://docs.docker.com/get-docker/) or [Podman](https://podman.io/)
-2. Export `CODE_SERVER_PASSWORD` in your shell with a unique password, then run <sup>[1](#1)</sup>
+2. Export `CODE_SERVER_PASSWORD` and `JUPYTER_PASSWORD` in your shell with unique passwords, then run <sup>[1](#1)</sup>
     ```shell
     docker run -it \
         --privileged \
         --name gold \
         --hostname $(hostname) \
         --env CODE_SERVER_PASSWORD \
+        --env JUPYTER_PASSWORD \
         -p 1337:1337 \
+        -p 13337:13337 \
         ghcr.io/jhwohlgemuth/gold
     ```
-3. Open [https://localhost:1337](https://localhost:1337) and sign in with that password. The image uses a self-signed certificate. <sup>[2](#2)</sup>
+3. Open [VS Code](https://localhost:1337) with `CODE_SERVER_PASSWORD` or [JupyterLab](https://localhost:13337/lab) with `JUPYTER_PASSWORD`. Both services use a self-signed certificate. <sup>[2](#2)</sup>
 
 > [!TIP]
 > See [Container Customization section](#container-customization) for more details on how to customize the container.
@@ -58,17 +60,31 @@ The following environment variables are available to customize containers:
   - Required unless `CODE_SERVER_PASSWORD_HASH` is supplied; there is no default password.
 - `CODE_SERVER_PASSWORD_HASH`: Password hash to use for code-server server
   - Alternative to `CODE_SERVER_PASSWORD`; there is no default hash. Takes precedence when both are supplied.
-- `JUPYTER_CONFIG`: Location of code-server server configuration file (within container)
-  - Default: `/root/.jupyter/jupyter_notebook_config.py`
+- `JUPYTER_CONFIG`: Optional Python config file inside the container, loaded after the shipped Jupyter defaults and before the required credential settings.
+  - Defaults come from `/home/nonroot/.jupyter/jupyter_notebook_config.py`; custom files are read without modification.
 - `JUPYTER_PORT`: Port to use for Jupyter server
   - Default: `13337`
-- `JUPYTER_PASSWORD_HASH`: Password to use for Jupyter server
-  - Default: `password`
+- `JUPYTER_PASSWORD`: Password to use for Jupyter server
+  - Required unless `JUPYTER_PASSWORD_HASH` is supplied; there is no default password. Jupyter hashes it in memory.
+- `JUPYTER_PASSWORD_HASH`: Jupyter-compatible password hash
+  - Alternative to `JUPYTER_PASSWORD`; there is no default hash. Takes precedence when both are supplied.
 
 > [!TIP]
 > Change environment variables with the `--env` parameter <sup>[4](#4)</sup> (ex. `docker run -it --env CODE_SERVER_PORT=8080 <image>`)
 
 Code-server refuses to start unless `CODE_SERVER_PASSWORD` or `CODE_SERVER_PASSWORD_HASH` is nonempty. A `hashed-password` in a custom `CODE_SERVER_CONFIG` takes precedence over a plaintext password; remove that field to use `CODE_SERVER_PASSWORD`, or override it with `CODE_SERVER_PASSWORD_HASH`.
+
+Jupyter refuses to start unless `JUPYTER_PASSWORD` or `JUPYTER_PASSWORD_HASH` is nonempty. Supplied credentials override custom-config passwords. Jupyter token login and password changes through the login page are disabled; change the supplied credential and recreate the container to rotate it. Missing credentials keep the affected service unavailable and produce a startup error in `docker logs`.
+
+To generate a Jupyter password hash interactively without putting the password in shell history, run:
+
+```shell
+docker run --rm -it --entrypoint /home/nonroot/miniconda3/bin/python \
+    ghcr.io/jhwohlgemuth/notebook \
+    -c 'from jupyter_server.auth import passwd; print(passwd())'
+```
+
+Export the result as `JUPYTER_PASSWORD_HASH` and pass it with `--env JUPYTER_PASSWORD_HASH` in place of `--env JUPYTER_PASSWORD`.
 
 ## Lean MCP Service
 
