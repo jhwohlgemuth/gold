@@ -1,11 +1,17 @@
 #!/usr/bin/with-contenv bash
+# shellcheck shell=bash
 
-CONFIG=${JUPYTER_CONFIG:-"${HOME}/.jupyter/jupyter_notebook_config.py"}
+set -eu
+
 PORT=${JUPYTER_PORT:-13337}
-PASSWORD=${JUPYTER_PASSWORD_HASH:-'argon2:$argon2id$v=19$m=10240,t=10,p=8$bY5rSBCPqjXzzLckWsGTLg$vYg9lyo18FG1kskOrT6ShA'}
-#
-# Jupyter Lab
-#
-sed -i "/c.ServerApp.port = /c\c.ServerApp.port = ${PORT}" $CONFIG
-sed -i "/c.ServerApp.password = /c\c.ServerApp.password = u'${PASSWORD}'" $CONFIG
-exec "${HOME}/miniconda3/bin/conda" run -n base jupyter lab >> /etc/services.d/$1/log 2>&1
+
+if [[ -z "${JUPYTER_PASSWORD:-}" && -z "${JUPYTER_PASSWORD_HASH:-}" ]]; then
+	printf '%s\n' 'jupyter: set JUPYTER_PASSWORD or JUPYTER_PASSWORD_HASH before starting the container.' >&2
+	exit 1
+fi
+
+# The shipped config loads JUPYTER_CONFIG, then applies environment credentials.
+# Run the base environment directly so s6 signals and logs reach Jupyter.
+export TRAITLETS_APPLICATION_RAISE_CONFIG_FILE_ERROR=1
+exec "${HOME}/miniconda3/bin/jupyter" lab \
+	--config "${HOME}/.jupyter/jupyter_notebook_config.py" --port "${PORT}"
