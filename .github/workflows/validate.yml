@@ -30,9 +30,9 @@ jobs:
         run: |
           set -euo pipefail
           cd "${RUNNER_TEMP}"
-          curl --fail --silent --show-error --location \
+          curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' \
             https://github.com/mvdan/sh/releases/download/v3.12.0/shfmt_v3.12.0_linux_amd64 -o shfmt
-          curl --fail --silent --show-error --location \
+          curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' \
             https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.x86_64.tar.xz \
             -o shellcheck.tar.xz
           printf '%s  %s\n' \
@@ -70,7 +70,7 @@ jobs:
         run: |
           set -euo pipefail
           cd "${RUNNER_TEMP}"
-          curl --fail --silent --show-error --location \
+          curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' \
             https://github.com/hadolint/hadolint/releases/download/v2.15.1/hadolint-linux-x86_64 -o hadolint
           printf '%s  %s\n' \
             c7187db94eeeeca956519a6af171adc31453941a1e777961f6e680f697c8c507 hadolint \
@@ -94,7 +94,7 @@ jobs:
         with:
           python-version: '3.12.11'
       - name: Install pinned Checkov
-        run: python -m pip install --disable-pip-version-check 'checkov==3.2.471'
+        run: python -m pip install --disable-pip-version-check --only-binary=':all:' 'checkov==3.2.471'
       - name: Analyze configuration
         # Override the local soft-fail setting: policy failures must fail CI.
         env:
