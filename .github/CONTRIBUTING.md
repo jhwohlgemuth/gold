@@ -60,16 +60,16 @@ These are the job/check names, not the workflow name `Validate`. They passed on 
 
 ### Required Checks on Main
 
-Verified on 2026-11-12 UTC: `main` is protected, but the three validation checks above are **not required by GitHub**. Classic branch protection has no required status checks. The active [main ruleset](https://github.com/jhwohlgemuth/gold/rules/1365542) requires CodeQL results and blocks branch deletion and force pushes; it has no required-status-check rule. Passing CI and enforcing it as a merge requirement are separate settings.
+Verified on 2026-11-12 UTC: the active [main ruleset](https://github.com/jhwohlgemuth/gold/rules/1365542) **requires all three validation checks above from GitHub Actions**. GitHub's effective rules for `main` include those exact check names and provider, and its PR check API marks each as required on [PR #9](https://github.com/jhwohlgemuth/gold/pull/9). The existing CodeQL, deletion, force-push, default-branch targeting, and bypass settings are unchanged. The ruleset does not require branches to be up to date before merging. Classic branch protection has no required status checks; enforcement is supplied by the ruleset.
 
-A maintainer with permission to edit repository rules can enable the gate:
+A maintainer with permission to edit repository rules can maintain the gate:
 
 1. Open repository **Settings → Rules → Rulesets** and edit the existing **main** ruleset targeting `main`.
-2. Enable **Require status checks to pass before merging** and add `Shell validation`, `Dockerfile validation`, and `Configuration validation` exactly as listed above. Select **GitHub Actions** as the expected source where offered.
+2. Keep **Require status checks to pass before merging** enabled with `Shell validation`, `Dockerfile validation`, and `Configuration validation` exactly as listed above. Keep **GitHub Actions** as the expected source.
 3. Keep enforcement **Active** and preserve the existing CodeQL, deletion, force-push, targeting, and bypass settings. Save the ruleset.
 4. Re-read the effective rules for `main` and confirm all three names appear. On a PR targeting `main`, verify they are marked required; an actor without a bypass must be unable to merge while a required check is pending or failing.
 
-GitHub documents [editing repository rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/managing-rulesets-for-a-repository) and [required status checks](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#require-status-checks-to-pass-before-merging). Enabling this gate is a separate repository-settings operation; update the dated verification statement above after confirming it is active.
+GitHub documents [editing repository rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/managing-rulesets-for-a-repository) and [required status checks](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#require-status-checks-to-pass-before-merging). After changing job names or repository rules, verify the effective gate and update the dated statement above.
 
 -------------
 

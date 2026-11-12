@@ -1,30 +1,32 @@
-# Implementation — required-check documentation (CI-02)
+# Implementation — required-check enforcement (CI-03)
 
-- Authorized scope: execute CI-02: contributor documentation and read-only verification of branch protection. GitHub settings were not changed.
-- Baseline: clean `main` at `87ad2c6`, merging PR #8; branch `docs/required-ci-checks`. Changes remain uncommitted and unpublished.
-- State: CI-02 complete and pruned. [CI-03](.wiki/features/ci-validation.md) now tracks the remaining external ruleset operation; the portfolio still contains three executable plans.
-- Product write set: `.github/CONTRIBUTING.md`. The wiki indexes/network/lanes and this handoff are reconciled with the remaining scope.
-- Budget: estimated under one active hour of the two-hour phase maximum.
+- Authorized scope: execute CI-03 by updating GitHub ruleset 1365542, preserving existing settings, verifying enforcement, and reconciling contributor documentation and the portfolio.
+- Baseline: clean `main` at `ea79e7f`, merging PR #9; local branch `docs/ci-enforcement`.
+- State: CI-03 complete and the CI plan retired. The GitHub ruleset change is live. Local documentation/planning changes remain uncommitted and unpublished.
+- Budget: estimated less than one active hour of the two-hour maximum.
 
-## Result
+## Live ruleset result
 
-Contributor instructions now list **Shell validation**, **Dockerfile validation**, and **Configuration validation**, distinguish job names from the `Validate` workflow name, explain their scope/failure behavior, link a passing run, and describe adding these checks to the existing active `main` ruleset. The guide states that they are currently not enforced and preserves the existing protection/bypass policy in its instructions. The existing dos2unix target description and yamllint config link were also corrected in this file.
+On 2026-11-12 UTC, the existing active [main ruleset 1365542](https://github.com/jhwohlgemuth/gold/rules/1365542) gained one `required_status_checks` rule containing:
 
-## Verified GitHub evidence
+- `Shell validation`, GitHub Actions integration ID 15368.
+- `Dockerfile validation`, GitHub Actions integration ID 15368.
+- `Configuration validation`, GitHub Actions integration ID 15368.
 
-Read on 2026-11-12 UTC:
+`strict_required_status_checks_policy` is false: the change requires the three checks without introducing an up-to-date-branch requirement. GitHub returned `do_not_enforce_on_create: false`.
 
-- `GET /repos/jhwohlgemuth/gold/branches/main`: `protected: true`; required status check contexts/checks empty and enforcement level `off`.
-- `GET /repos/jhwohlgemuth/gold/branches/main/protection`: no `required_status_checks`; classic protection exists.
-- `GET /repos/jhwohlgemuth/gold/rules/branches/main`: active rules are `deletion`, `code_scanning` for CodeQL, and `non_fast_forward`; no required-status-check rule.
-- `GET /repos/jhwohlgemuth/gold/rulesets/1365542`: name `main`, enforcement `active`, target `~DEFAULT_BRANCH`, existing CodeQL thresholds `high_or_higher`/`errors`, and an always-bypass entry for repository role ID 5.
-- `GET /repos/jhwohlgemuth/gold/actions/runs/43133232599/jobs`: all three documented jobs concluded `success` on PR #7 at `2fbb4ad`.
-- `GET /repos/jhwohlgemuth/gold/check-runs/130902206852`: provider `github-actions`, app ID `15368`.
+Before updating, the current ruleset was compared with the inspected snapshot to prevent overwriting intervening edits. The update retained its name, branch target, Active enforcement, `~DEFAULT_BRANCH` targeting, empty exclude list, CodeQL thresholds (`high_or_higher` / `errors`), deletion/non-fast-forward protections, and always-bypass entry for repository role ID 5. The before/after comparison confirmed those fields and all prior rules were unchanged.
 
-Passing-run evidence: [run 43133232599](https://github.com/jhwohlgemuth/gold/actions/runs/43133232599). Ruleset: [main / 1365542](https://github.com/jhwohlgemuth/gold/rules/1365542). Maintainer instructions were checked against GitHub's official ruleset-management and required-status-check documentation linked in CONTRIBUTING.
+Temporary audit snapshots: `/var/folders/j8/zdr2cnr934x80qdkddy48nshjhbsm8/T/gold-ci03-an0nt3tn/before.json`, `update.json`, `after.json`, and `effective-main.json`. The mutation used `PUT /repos/jhwohlgemuth/gold/rulesets/1365542`; readbacks used that ruleset endpoint and `GET /repos/jhwohlgemuth/gold/rules/branches/main`.
 
-## Validation and next action
+## Verification
 
-The three documented names exactly match job names in `.github/workflows/validate.yml` and the inspected passing run. Contributor-document local links resolve. The Makefile has `convert` and the linked yamllint file is `.yamllint.yaml`. Wiki validation and `git diff --check` passed after final reconciliation.
+The effective branch rules include exactly the three expected names/provider IDs from ruleset 1365542. GitHub GraphQL also returned `isRequired(pullRequestNumber: 9): true` for each job on [PR #9](https://github.com/jhwohlgemuth/gold/pull/9), whose base is `main`; each check concluded `SUCCESS` at `ad6d0899fc77a6a2dc474536c7dc975de21e79c4`.
 
-Next action: review/commit this documentation, then execute CI-03 to add the three checks to ruleset 1365542, preserve the existing target/rules/bypasses, verify effective enforcement on `main`, and update the dated contributor-documentation status. No settings change, commit, push, or future execution was performed or scheduled during CI-02.
+There were no open PRs, so required-check flags were inspected on the existing merged PR #9. No merge or bypass attempt was performed. The ruleset retains its existing bypass policy.
+
+Contributor instructions now describe the active enforcement and how to maintain it. CI plan/index/network/lane references were removed; the portfolio contains two executable plans. Local validation compares documented check names to the workflow, resolves local Markdown links, runs the wiki validator, and checks the diff for whitespace errors.
+
+## Next action
+
+Review/commit the local documentation changes. The next executable work is [MID-02](.wiki/features/midas-cli.md): first narrow its repository-wide write set to exact files, then package the Rust CLI. Its Terminal image validation shares a lock with IM-01. No later phase has been started or scheduled.
