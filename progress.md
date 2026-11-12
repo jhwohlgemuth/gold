@@ -1,52 +1,30 @@
-# Implementation — Jupyter credentials (AD-02)
+# Implementation — required-check documentation (CI-02)
 
-- Authorized scope: AD-02, plus reconciliation of completed CI-01 evidence. CI-02 and the image/CLI phases remain future work.
-- Baseline: clean `main` at `cc1af0d`, merging PR #7; implementation branch `feat/jupyter-credentials`. Changes remain uncommitted and unpublished.
-- State: AD-02 complete; the access-defaults plan is retired. The portfolio now contains three executable plans. Next phase: [CI-02](.wiki/features/ci-validation.md).
-- Product write set: `config/jupyter/jupyter_notebook_config.py`, `config/jupyter/service/run`, `README.md`.
-- Budget: estimated less than one active hour of the five-hour maximum; external waiting excluded.
+- Authorized scope: execute CI-02: contributor documentation and read-only verification of branch protection. GitHub settings were not changed.
+- Baseline: clean `main` at `87ad2c6`, merging PR #8; branch `docs/required-ci-checks`. Changes remain uncommitted and unpublished.
+- State: CI-02 complete and pruned. [CI-03](.wiki/features/ci-validation.md) now tracks the remaining external ruleset operation; the portfolio still contains three executable plans.
+- Product write set: `.github/CONTRIBUTING.md`. The wiki indexes/network/lanes and this handoff are reconciled with the remaining scope.
+- Budget: estimated under one active hour of the two-hour phase maximum.
 
-## Implemented behavior
+## Result
 
-Jupyter requires `JUPYTER_PASSWORD` or `JUPYTER_PASSWORD_HASH`; a supplied hash wins when both are set. Its shipped config loads an optional custom Python config, then applies the environment credential and disables token login and login-page password changes. Plaintext is hashed in memory and removed from Jupyter's environment; the hash remains available for extension config reloads. Custom files and the shipped config are not rewritten, and secrets are not passed as process arguments. Missing credentials and invalid custom-config paths prevent service startup with visible errors.
+Contributor instructions now list **Shell validation**, **Dockerfile validation**, and **Configuration validation**, distinguish job names from the `Validate` workflow name, explain their scope/failure behavior, link a passing run, and describe adding these checks to the existing active `main` ruleset. The guide states that they are currently not enforced and preserves the existing protection/bypass policy in its instructions. The existing dos2unix target description and yamllint config link were also corrected in this file.
 
-The service directly launches the base environment's `jupyter` executable so s6 receives its output and can deliver signals. README documents both browser login URLs, required environment variables, credential precedence, and interactive hash generation.
+## Verified GitHub evidence
 
-## Validation evidence
+Read on 2026-11-12 UTC:
 
-All results below apply to this branch's current uncommitted product files. On 2026-11-11 local time, a disposable derivative was built on Docker context `oklahoma` from `ghcr.io/jhwohlgemuth/notebook:1.0.5-amd64`, base image `sha256:bab8ca98f4198de9f69e927718a1aac5775061acbdd174a43c7ec6549c490677`, with only the changed browser service/config files and the temporary test harness copied in. Tested derivative ID: `sha256:c4278f33ddbeda00722edd3ab745a875b0b879b5fb185aa45f7daeb953fe5b07`. Installed Jupyter Server: 2.21.1; code-server: 4.143.1.
+- `GET /repos/jhwohlgemuth/gold/branches/main`: `protected: true`; required status check contexts/checks empty and enforcement level `off`.
+- `GET /repos/jhwohlgemuth/gold/branches/main/protection`: no `required_status_checks`; classic protection exists.
+- `GET /repos/jhwohlgemuth/gold/rules/branches/main`: active rules are `deletion`, `code_scanning` for CodeQL, and `non_fast_forward`; no required-status-check rule.
+- `GET /repos/jhwohlgemuth/gold/rulesets/1365542`: name `main`, enforcement `active`, target `~DEFAULT_BRANCH`, existing CodeQL thresholds `high_or_higher`/`errors`, and an always-bypass entry for repository role ID 5.
+- `GET /repos/jhwohlgemuth/gold/actions/runs/43133232599/jobs`: all three documented jobs concluded `success` on PR #7 at `2fbb4ad`.
+- `GET /repos/jhwohlgemuth/gold/check-runs/130902206852`: provider `github-actions`, app ID `15368`.
 
-Seven scenarios passed in fresh containers using the normal `/init` entrypoint and s6 supervision:
+Passing-run evidence: [run 43133232599](https://github.com/jhwohlgemuth/gold/actions/runs/43133232599). Ruleset: [main / 1365542](https://github.com/jhwohlgemuth/gold/rules/1365542). Maintainer instructions were checked against GitHub's official ruleset-management and required-status-check documentation linked in CONTRIBUTING.
 
-- Plaintext containing punctuation and a newline: supplied logins work on ports 1337 and 13337.
-- Hash plus plaintext: the hash wins and the ignored plaintext is rejected.
-- Hash only: the existing `JUPYTER_PASSWORD_HASH` path works without a plaintext variable.
-- Custom config: its base URL is preserved; its old password and token cannot log in; the supplied credential works; the service port takes precedence over the custom-config port.
-- Missing credentials: both browser ports remain unavailable and startup errors identify the required variables.
-- Empty credentials: same fail-closed result.
-- Missing custom-config file: Jupyter remains unavailable and logs the configuration error.
+## Validation and next action
 
-For successful-start scenarios, unauthenticated/wrong/default-password requests were rejected; accepted credentials established a session and authenticated access. Jupyter's protected API rejected the stale custom token. Checksums confirmed shipped configuration files were unchanged. No config-load exceptions occurred after the reload fix. This also resolves the previous unverified normal-s6-startup check; it does not establish full source image builds or the architecture matrix.
+The three documented names exactly match job names in `.github/workflows/validate.yml` and the inspected passing run. Contributor-document local links resolve. The Makefile has `convert` and the linked yamllint file is `.yamllint.yaml`. Wiki validation and `git diff --check` passed after final reconciliation.
 
-Focused checks passed:
-
-```sh
-shfmt -d config/jupyter/service/run
-shellcheck config/jupyter/service/run
-python3 -B .agents/skills/planning/scripts/validate_wiki.py .
-git diff --check
-```
-
-Python AST parsing and README local-link checks passed. Checkov 3.2.471 with `CKV_PARSE_ERROR_FAIL=true`, `--hard-fail-on '*'`, and `--skip-download` passed 589 Dockerfile and 84 Actions checks with zero failures.
-
-Temporary reproduction assets are `/tmp/gold-ad02-runtime-check.py`, `/tmp/gold-ad02-http-check.py`, and build context `/var/folders/j8/zdr2cnr934x80qdkddy48nshjhbsm8/T/gold-ad02-cy3ezrgo`. Rebuild the disposable `gold-ad02-validation:cy3ezrgo` image from that context on `oklahoma`, then run the runtime-check script from the repository root. The script creates and removes each scenario container. These are temporary execution artifacts, not a committed test suite.
-
-Cleanup is complete: the initial test containers and the final disposable image tag were removed; a name-filtered container listing returned no remaining AD-02 containers.
-
-An initial `docker cp` attempt failed because the Mac UID could not map into rootless Docker's user namespace. Packaging the harness with explicit Linux ownership resolved it. The product config also needed to retain its computed hash for repeated extension loads; the final seven scenarios validate that correction.
-
-## CI evidence and next action
-
-PR #7 merged as `cc1af0d`. At `2fbb4ad`, all three jobs passed in [run 43133232599](https://github.com/jhwohlgemuth/gold/actions/runs/43133232599): **Shell validation**, **Dockerfile validation**, **Configuration validation**. SonarCloud reported zero new issues after HTTPS-only downloads and wheel-only Checkov installation. CI-01 is removed and CI-02 is ready.
-
-Next action: review/commit the AD-02 changes, then execute CI-02 to document the exact required checks and inspect branch-protection status. No future run has been scheduled.
+Next action: review/commit this documentation, then execute CI-03 to add the three checks to ruleset 1365542, preserve the existing target/rules/bypasses, verify effective enforcement on `main`, and update the dated contributor-documentation status. No settings change, commit, push, or future execution was performed or scheduled during CI-02.
