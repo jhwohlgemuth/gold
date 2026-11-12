@@ -3,7 +3,7 @@
 
 ## Image Design
 > [!NOTE]
-> Images are built using GitHub Actions and deployed to the Github Container Registry, `ghcr.io`, under the username, `jhwohlgemuth`
+> Image build and publishing targets are defined in the [Makefile](./Makefile). The configured public registry is `ghcr.io/jhwohlgemuth`.
 
 The following images are available:
 - `ghcr.io/jhwohlgemuth/terminal`: Core image with all necessary system dependencies (intended for terminal-only development)
@@ -15,14 +15,27 @@ The following images are available:
     - Provers
     - Other tools for software correctness
 
-The images are build according to the following dependency graph:
+The images are built according to the following dependency graph:
 ```mermaid
 graph LR
     terminal --> notebook
     notebook --> gold
 ```
 
-Terminal and Notebook version `1.0.5` have build paths for both Linux amd64 and arm64.
+### Build Targets
+
+| Image | Linux amd64 | Linux arm64 | Prerequisite built by the target |
+| --- | --- | --- | --- |
+| Terminal | `make terminal-image-amd64` | `make terminal-image-arm64` | None |
+| Notebook | `make notebook-image-amd64` | `make notebook-image-arm64` | Terminal for the same platform |
+| Gold | `make gold-image-amd64` | No target | Notebook and Terminal for amd64 |
+
+These targets build and tag local images with the configured version and `latest`; they do not push them. Both architectures use the same local tag names, so validate each platform before building the other under those tags. The targets establish build paths, not passing build or runtime evidence.
+
+`make terminal-image` and `make notebook-image` use Buildx to build **and push** both architectures.
+Publish Terminal before Notebook because Notebook consumes the matching Terminal image from the registry.
+There is no `make gold-image` target; Gold uses `make gold-image-amd64`, followed by `make push-gold` when publishing is intended.
+Registry access and a builder supporting the requested platforms are required for publishing.
 
 ## Lean MCP Service
 
@@ -30,10 +43,8 @@ Terminal and Notebook version `1.0.5` have build paths for both Linux amd64 and 
 
 ## Related Environments
 
-[Goldsmith](./goldsmith/README.md), formerly Gold's agentic image, is maintained
-as a separate product. Its initial release consumes a pinned Notebook image as a
-documented base-image dependency while keeping its versioning, runtime services,
-and release lifecycle independent from Gold. Formal verification (Lean LSP MCP, formerly Goldsmith's `mcp-lean --profile formal` sidecar) now lives in Gold as an s6 service alongside code-server/Jupyter.
+Its initial release consumes a pinned Notebook image as a documented base-image dependency while keeping its versioning, runtime services, and release lifecycle independent from Gold.
+Formal verification (Lean LSP MCP, formerly Goldsmith's `mcp-lean --profile formal` sidecar) now lives in Gold as an s6 service alongside code-server/Jupyter.
 
 ## Service Topology
 

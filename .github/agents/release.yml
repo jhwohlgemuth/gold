@@ -54,7 +54,7 @@ rules:
       - input: build_gold
     then:
       - action: run_make_target
-        target: gold-image
+        target: gold-image-amd64
       - action: push_image
         image: gold
 

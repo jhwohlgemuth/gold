@@ -9,16 +9,17 @@
 Use VS Code in the browser in **Three Easy Steps™**
 
 1. Install [Docker](https://docs.docker.com/get-docker/) or [Podman](https://podman.io/)
-2. Run the command <sup>[1](#1)</sup>
+2. Export `CODE_SERVER_PASSWORD` in your shell with a unique password, then run <sup>[1](#1)</sup>
     ```shell
     docker run -it \
         --privileged \
         --name gold \
         --hostname $(hostname) \
+        --env CODE_SERVER_PASSWORD \
         -p 1337:1337 \
         ghcr.io/jhwohlgemuth/gold
     ```
-3. Open a browser and navigate to [https://localhost:1337](https://localhost:1337) <sup>[2](#2)</sup>
+3. Open [https://localhost:1337](https://localhost:1337) and sign in with that password. The image uses a self-signed certificate. <sup>[2](#2)</sup>
 
 > [!TIP]
 > See [Container Customization section](#container-customization) for more details on how to customize the container.
@@ -31,8 +32,6 @@ Use VS Code in the browser in **Three Easy Steps™**
 
 
 ## Things you can do with Gold
-> [!TIP]
-> See the [examples directory](./examples/) for details on all the things you can do with Gold.
 
 - Write, run, and debug [Rocq](https://rocq-prover.org/) code from within a browser-based instance of VSCode <sup>[3](#3)</sup>
 - Work with modern [Rust](https://www.rust-lang.org/)-based projects to write provably correct software
@@ -56,7 +55,9 @@ The following environment variables are available to customize containers:
 - `CODE_SERVER_PORT`: Port to use for code-server server
   - Default: `1337`
 - `CODE_SERVER_PASSWORD`: Password to use for code-server server
-  - Default: `password`
+  - Required unless `CODE_SERVER_PASSWORD_HASH` is supplied; there is no default password.
+- `CODE_SERVER_PASSWORD_HASH`: Password hash to use for code-server server
+  - Alternative to `CODE_SERVER_PASSWORD`; there is no default hash. Takes precedence when both are supplied.
 - `JUPYTER_CONFIG`: Location of code-server server configuration file (within container)
   - Default: `/root/.jupyter/jupyter_notebook_config.py`
 - `JUPYTER_PORT`: Port to use for Jupyter server
@@ -66,6 +67,8 @@ The following environment variables are available to customize containers:
 
 > [!TIP]
 > Change environment variables with the `--env` parameter <sup>[4](#4)</sup> (ex. `docker run -it --env CODE_SERVER_PORT=8080 <image>`)
+
+Code-server refuses to start unless `CODE_SERVER_PASSWORD` or `CODE_SERVER_PASSWORD_HASH` is nonempty. A `hashed-password` in a custom `CODE_SERVER_CONFIG` takes precedence over a plaintext password; remove that field to use `CODE_SERVER_PASSWORD`, or override it with `CODE_SERVER_PASSWORD_HASH`.
 
 ## Lean MCP Service
 
@@ -84,9 +87,20 @@ Run `docker run -p 11005:11005 ghcr.io/jhwohlgemuth/gold` and the MCP is availab
 > [!TIP]
 > See [ARCHITECTURE.md](./ARCHITECTURE.md)
 
+## Building Images
+
+Run these targets from the repository root with Docker available. See the [build target matrix](./ARCHITECTURE.md#build-targets) for architecture coverage and publishing targets.
+
+```shell
+make gold-image-amd64       # Builds Terminal, Notebook, then Gold for amd64
+make notebook-image-arm64  # Builds Terminal, then Notebook for arm64
+```
+
+These targets build local images without publishing them. Build paths exist for both architectures, but successful builds and startup checks must be verified on the selected builder before publishing.
+
 ## Related Projects
 
-- [Goldsmith](./goldsmith/README.md) is the independently branded agentic
+- Goldsmith is the independently branded agentic
   development environment that originated in Gold.
 
 ## Contributing

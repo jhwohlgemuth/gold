@@ -6,7 +6,7 @@ difficulty: medium
 impact: high
 package: [github-actions, build]
 tags: [ci, lint, shell, dockerfile]
-status: planned
+status: waiting-on-validation
 execution: phased
 phase_budget_hours: 5
 ---
@@ -17,7 +17,7 @@ Make code quality checks visible as required pull request results.
 
 # Current evidence
 
-`.github/workflows/` contains only `prune.yml`, which runs on schedule and manual dispatch. `.github/agents/development.yml` describes pull request checks, but it is an agent configuration file, not a GitHub Actions workflow. `Makefile` defines `check` and `lint`; `check` runs formatting, shellcheck, and Checkov, while `lint` runs Hadolint. No pull request execution of these targets is present in the current workflow directory.
+`.github/workflows/validate.yml` now defines PR and manual validation with SHA-pinned actions, checksum-verified shell/Dockerfile tools, and fixed Checkov/Python versions. The jobs are `Shell validation`, `Dockerfile validation`, and `Configuration validation`. Local validation passed with actionlint 1.7.7, shfmt 3.12.0, ShellCheck 0.11.0, Hadolint 2.15.1, and Checkov 3.2.471 (589 Dockerfile and 84 Actions checks). Hadolint warnings/errors fail while informational diagnostics remain visible; negative fixtures confirmed warning and Checkov failure propagation. Checkov's wildcard hard-fail overrides `.checkov.yaml`'s soft-fail; parsing errors also fail. No GitHub PR run has occurred for this uncommitted implementation; see `progress.md` for the handoff.
 
 # Boundaries and decisions
 
@@ -31,14 +31,14 @@ Add validation before image build automation. Pin third-party actions and tools 
 
 # Execution phases
 
-## CI-01 — Add read-only source validation
+## CI-01 — Verify read-only source validation on GitHub
 
-- Status: ready
+- Status: blocked
 - Budget: 5 active hours maximum
-- Prerequisites: none
-- Exact write set: `.github/workflows/validate.yml`
+- Prerequisites: publish the implementation branch and open a pull request so GitHub Actions can run the new workflow
+- Exact write set: GitHub Actions for `jhwohlgemuth/gold`, `.github/workflows/validate.yml` for workflow-specific corrections
 - Primary integration lock: pull request validation workflow
-- Outcome: A pull request workflow runs the shell, Dockerfile, and configuration checks with pinned actions and deterministic tool versions.
+- Outcome: Record the first passing PR run of the implemented workflow and its exact status check names.
 - Focused validation: parse the workflow YAML, run `actionlint` if available, and inspect a pull request run in GitHub Actions.
 - Handoff: Record job names and the first passing run; make CI-02 ready.
 
