@@ -17,11 +17,11 @@ Record reproducible build and startup evidence before advertising the new archit
 
 # Current evidence
 
-The working tree changes `Makefile` to define terminal and notebook amd64/arm64 targets and a Gold amd64 target; it changes s6 archive selection in `Dockerfile.terminal`, introduces `provision/notebook/install_conda.sh`, and changes ARM64 .NET/PowerShell installation. `ARCHITECTURE.md` calls out Terminal and Notebook 1.0.5 build paths. `docker info` failed here because no Docker daemon was available. No build or runtime pass is inferred from the target definitions.
+Commit `4235e12` added Terminal and Notebook amd64/arm64 targets, Gold amd64, architecture-specific s6 selection, Miniforge installation, and ARM64 .NET/PowerShell support. On 2026-11-11 local `docker info` could not reach a daemon; `docker buildx ls` outside the sandbox reported running remote builders, including `dante` advertising amd64 and arm64 and `vergil` advertising arm64. Select explicit Docker contexts for validation; the default remains unavailable. No build or runtime pass is inferred from target definitions or advertised builder platforms.
 
 # Boundaries and decisions
 
-Keep this as validation of the existing local architecture changes. Record failures before proposing repairs; a failure requiring product edits becomes a separate bounded repair phase with an exact write set. Publishing is outside this plan.
+Keep this as validation of the existing committed architecture changes. Record failures before proposing repairs; a failure requiring product edits becomes a separate bounded repair phase with an exact write set. Publishing is outside this plan.
 
 # Validation and acceptance criteria
 
@@ -33,9 +33,9 @@ Keep this as validation of the existing local architecture changes. Record failu
 
 ## IM-01 — Verify Terminal on both architectures
 
-- Status: blocked
+- Status: ready
 - Budget: 5 active hours maximum
-- Prerequisites: working amd64 and arm64 Docker builders
+- Prerequisites: select explicit remote Docker contexts advertising amd64 and arm64 support; local Docker is unavailable
 - Exact write set: `docs/image-build-matrix.md`
 - Primary integration lock: image build verification
 - Outcome: Record Terminal amd64 and arm64 build and shell smoke results, including s6 and PowerShell availability.

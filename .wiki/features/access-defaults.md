@@ -17,11 +17,11 @@ Make the published quick start safe to expose on a host without a shared, docume
 
 # Current evidence
 
-`config/code-server/config.yaml` contains `auth: password` and `password: password`. `README.md` documents `password` as the code-server default and lists a Jupyter password default. `config/jupyter/jupyter_notebook_config.py` embeds a fixed password hash. The quick start publishes code-server port 1337. This establishes shared image defaults; it does not establish whether a runtime override is already applied in any deployment.
+Code-server no longer ships a password. Its service requires `CODE_SERVER_PASSWORD` or `CODE_SERVER_PASSWORD_HASH`, forces password authentication, and passes secrets through native environment variables without editing configuration. README documents startup and hash precedence. On 2026-11-11, ShellCheck and shfmt passed, and actual HTTPS login tests passed using the changed files in an existing Notebook 1.0.5-amd64 container on Docker context `oklahoma`: missing/empty credentials fail, wrong/default credentials are rejected, supplied plaintext/hash credentials work, custom auth/hash behavior is enforced, and config remains unchanged. See `progress.md` for image identity and test details. A separate full `/init`/s6 smoke attempt yielded no result and remains unverified; no new full image was built. Jupyter's config and service still contain a fixed password hash, so browser credential migration is not yet complete.
 
 # Boundaries and decisions
 
-Preserve password authentication and the existing service ports. Decide how the entrypoint rejects a missing credential or generates a unique one, then document how a user obtains it. Do not claim TLS trust from the image's self-signed certificate.
+Preserve password authentication and the existing service ports. Code-server now rejects a missing operator supplied credential. Align Jupyter's credential contract and document its startup behavior without claiming TLS trust from the image's self-signed certificate.
 
 # Validation and acceptance criteria
 
@@ -31,22 +31,11 @@ Preserve password authentication and the existing service ports. Decide how the 
 
 # Execution phases
 
-## AD-01 — Remove the reusable code-server password
+## AD-02 — Align Jupyter credentials and user instructions
 
 - Status: ready
 - Budget: 5 active hours maximum
-- Prerequisites: none
-- Exact write set: `config/code-server/config.yaml`, `config/code-server/service/run`, `config/code-server/service/finish`
-- Primary integration lock: browser service authentication
-- Outcome: code-server starts with an operator supplied secret or an individually generated secret, with a clear startup failure or retrieval path.
-- Focused validation: inspect rendered service config and run a local container login check when Docker is available; run `shellcheck config/code-server/service/run config/code-server/service/finish`.
-- Handoff: Record the startup and login result, then make AD-02 ready.
-
-## AD-02 — Align Jupyter credentials and user instructions
-
-- Status: planned
-- Budget: 5 active hours maximum
-- Prerequisites: AD-01
+- Prerequisites: none; code-server's operator-supplied credential contract is implemented and documented
 - Exact write set: `config/jupyter/jupyter_notebook_config.py`, `config/jupyter/service/run`, `README.md`
 - Primary integration lock: browser service authentication
 - Outcome: Jupyter uses a container-specific or supplied credential and the quick start explains both service login paths.
